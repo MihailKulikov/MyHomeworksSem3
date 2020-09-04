@@ -137,5 +137,26 @@ namespace MatrixTests
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
         }
+
+        [Test]
+        public void Throw_ArgumentException_When_Trying_To_Generate_Random_Matrix_With_Non_Positive_Row_Count()
+        {
+            Assert.That(() => Matrix.GenerateRandomMatrix(-1, 10), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void Throw_ArgumentException_When_Trying_To_Generate_Random_Matrix_With_Non_Positive_Column_Count()
+        {
+            Assert.That(() => Matrix.GenerateRandomMatrix(10, -1), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void Generate_Random_Matrix()
+        {
+            var generatedMatrix = Matrix.GenerateRandomMatrix(42, 2);
+
+            Assert.That(generatedMatrix.Elements.GetLength(0) == 42);
+            Assert.That(generatedMatrix.Elements.GetLength(1) == 2);
+        }
     }
 }
