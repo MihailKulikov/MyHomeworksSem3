@@ -80,11 +80,39 @@ namespace MatrixTests
         }
 
         [Test]
+        public void Throw_ArgumentNullException_When_Trying_To_MultiplyParallel_With_Null()
+        {
+            matrix = new Matrix(new int[1,1]);
+            
+            Assert.That(() => matrix.MultiplyWithParallel(null), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        public void Throw_ArgumentException_When_Trying_To_MultiplyParallel_With_Matrix_With_Wrong_Row_Count()
+        {
+            matrix = new Matrix(new int[1, 1]);
+
+            Assert.That(() => matrix.MultiplyWithParallel(new Matrix(new int[2, 1])), Throws.ArgumentException);
+        }
+
+        [TestCaseSource(nameof(ArgumentsForMultiplyingAndExpectedResultCases))]
+        [Test]
+        public void Return_Correct_Result_From_MultiplyingParallel_With_Other_Matrix(
+            (Matrix firstFactor, Matrix secondFactor, Matrix result) argumentsForMultiplyingAndExpectedResultCase)
+        {
+            var (firstFactor, secondFactor, expectedResult) = argumentsForMultiplyingAndExpectedResultCase;
+
+            var actualResult = firstFactor.MultiplyWithParallel(secondFactor);
+
+            Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
+        }
+        
+        [Test]
         public void Throw_ArgumentNullException_When_Trying_To_Multiply_With_Null()
         {
             matrix = new Matrix(new int[1,1]);
             
-            Assert.That(() => matrix.MultiplyWith(null), Throws.ArgumentNullException);
+            Assert.That(() => matrix.MultiplyWithParallel(null), Throws.ArgumentNullException);
         }
 
         [Test]

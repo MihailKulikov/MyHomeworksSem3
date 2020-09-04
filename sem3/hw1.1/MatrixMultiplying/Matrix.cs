@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace MatrixMultiplying
 {
@@ -57,17 +58,49 @@ namespace MatrixMultiplying
             {
                 for (var currentColumn = 0; currentColumn < resultMatrix.GetLength(1); currentColumn++)
                 {
-                    for (var i = 0; i < Elements.GetLength(1); i++)
-                    {
-                        resultMatrix[currentRow, currentColumn] +=
-                            Elements[currentRow, i] * other.Elements[i, currentColumn];
-                    }
+                    resultMatrix[currentRow, currentColumn] =
+                        CalculateElementOfResultMatrix(currentRow, currentColumn, other);
                 }
             }
             
             return new Matrix(resultMatrix);
         }
-        // public Matrix MultiplyWithAsync(Matrix other)
-        // {}
+
+        private int CalculateElementOfResultMatrix(int rowNumber, int columnNumber, Matrix other)
+        {
+            var resultValue = 0;
+            for (var i = 0; i < Elements.GetLength(1); i++)
+            {
+                resultValue += Elements[rowNumber, i] * other.Elements[i, columnNumber];
+            }
+
+            return resultValue;
+        }
+
+        public Matrix MultiplyWithParallel(Matrix other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (Elements.GetLength(1) != other.Elements.GetLength(0))
+            {
+                throw new ArgumentException($"Row count of {nameof(other)} matrix should be {Elements.GetLength(1)}.");
+            }
+            
+            var resultMatrix = new int[Elements.GetLength(0), other.Elements.GetLength(1)];
+
+            Parallel.For(0, resultMatrix.GetLength(0), currentRow =>
+            {
+                for (var currentColumn = 0; currentColumn < resultMatrix.GetLength(1); currentColumn++)
+                {
+                    resultMatrix[currentRow, currentColumn] =
+                        CalculateElementOfResultMatrix(currentRow, currentColumn, other);
+                }
+            });
+
+            return new Matrix(resultMatrix);
+        }
     }
 }
