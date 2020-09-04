@@ -4,6 +4,8 @@ namespace MatrixMultiplying
 {
     public class Matrix
     {
+        public int[,] Elements { get; }
+        
         public Matrix(int[,] elements)
         {
             if (elements == null)
@@ -18,8 +20,18 @@ namespace MatrixMultiplying
 
             Elements = elements;
         }
-        
-        public int[,] Elements { get; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() == obj.GetType())
+            {
+                return false;
+            }
+
+            var otherMatrix = (Matrix) obj;
+
+            return Elements.Equals(otherMatrix.Elements);
+        }
 
         public Matrix MultiplyWith(Matrix other)
         {
@@ -27,12 +39,7 @@ namespace MatrixMultiplying
             {
                 throw new ArgumentNullException(nameof(other));
             }
-
-            if (other.Elements.GetLength(0) == 0 || other.Elements.GetLength(1) == 0)
-            {
-                throw new ArgumentException($"{nameof(other)} should not be empty.");
-            }
-
+            
             if (Elements.GetLength(1) == other.Elements.GetLength(0))
             {
                 throw new ArgumentException($"Row count of {nameof(other)} matrix should be {Elements.GetLength(1)}.");
