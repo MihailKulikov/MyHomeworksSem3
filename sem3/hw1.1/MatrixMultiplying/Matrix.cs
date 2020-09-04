@@ -21,26 +21,14 @@ namespace MatrixMultiplying
             Elements = elements;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() == obj.GetType())
-            {
-                return false;
-            }
-
-            var otherMatrix = (Matrix) obj;
-
-            return Elements.Equals(otherMatrix.Elements);
-        }
-
         public Matrix MultiplyWith(Matrix other)
         {
             if (other == null)
             {
                 throw new ArgumentNullException(nameof(other));
             }
-            
-            if (Elements.GetLength(1) == other.Elements.GetLength(0))
+
+            if (Elements.GetLength(1) != other.Elements.GetLength(0))
             {
                 throw new ArgumentException($"Row count of {nameof(other)} matrix should be {Elements.GetLength(1)}.");
             }

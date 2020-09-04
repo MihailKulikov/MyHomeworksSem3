@@ -105,11 +105,9 @@ namespace MatrixTests
                 argumentsForMultiplyingAndExpectedResultCase.secondFactor,
                 argumentsForMultiplyingAndExpectedResultCase.result);
 
-            var firstActualResult = firstFactor.MultiplyWith(secondFactor);
-            var secondActualResult = secondFactor.MultiplyWith(firstFactor);
+            var actualResult = firstFactor.MultiplyWith(secondFactor);
 
-            Assert.That(firstActualResult, Is.EqualTo(secondActualResult));
-            Assert.That(firstActualResult, Is.EqualTo(expectedResult));
+            Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
         }
     }
 }
