@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Matrix
+namespace MatrixMultiplying
 {
     class Program
     {
