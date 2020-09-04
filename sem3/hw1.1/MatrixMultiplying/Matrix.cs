@@ -99,6 +99,13 @@ namespace MatrixMultiplying
             return new Matrix(resultMatrix);
         }
         
+        /// <summary>
+        /// Generate new instance of <see cref="Matrix"/> class with random elements and specified row's and column's count.
+        /// </summary>
+        /// <param name="rowCount">Specified row's count of generated matrix.</param>
+        /// <param name="columnCount">Specified column's count of generated matrix.</param>
+        /// <returns>Generated matrix with random elements and specified row's and column's count</returns>
+        /// <exception cref="ArgumentException"><paramref name="rowCount"/> is not positive; <paramref name="columnCount"/> is not positive.</exception>
         public static Matrix GenerateRandomMatrix(int rowCount, int columnCount)
         {
             if (rowCount <= 0)
