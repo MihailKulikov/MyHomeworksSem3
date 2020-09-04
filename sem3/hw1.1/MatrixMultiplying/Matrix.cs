@@ -12,7 +12,7 @@ namespace MatrixMultiplying
         /// Elements of matrix.
         /// </summary>
         public int[,] Elements { get; }
-        
+
         /// <summary>
         /// Initialize new instance of <see cref="Matrix"/> class with specified elements.
         /// </summary>
@@ -25,7 +25,7 @@ namespace MatrixMultiplying
             {
                 throw new ArgumentNullException(nameof(elements));
             }
-            
+
             if (elements.GetLength(0) == 0 || elements.GetLength(1) == 0)
             {
                 throw new ArgumentException($"{nameof(elements)} should not be empty.");
@@ -35,7 +35,7 @@ namespace MatrixMultiplying
         }
 
         /// <summary>
-        /// Returns result from multiplying this matrix with <paramref name="other"/> matrix.
+        /// Calculates result from multiplying this matrix with <paramref name="other"/> matrix.
         /// </summary>
         /// <param name="other">Second factor of matrix multiplying.</param>
         /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
@@ -62,21 +62,17 @@ namespace MatrixMultiplying
                         CalculateElementOfResultMatrix(currentRow, currentColumn, other);
                 }
             }
-            
+
             return new Matrix(resultMatrix);
         }
-
-        private int CalculateElementOfResultMatrix(int rowNumber, int columnNumber, Matrix other)
-        {
-            var resultValue = 0;
-            for (var i = 0; i < Elements.GetLength(1); i++)
-            {
-                resultValue += Elements[rowNumber, i] * other.Elements[i, columnNumber];
-            }
-
-            return resultValue;
-        }
-
+        
+        /// <summary>
+        /// Calculates result from multiplying this matrix with <paramref name="other"/> matrix with using multiple threads.
+        /// </summary>
+        /// <param name="other">Second factor of matrix multiplying.</param>
+        /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <code>null</code>.</exception>
+        /// <exception cref="ArgumentException">Row count of <paramref name="other"/> matrix is not equal to column count of this matrix.</exception>
         public Matrix MultiplyWithParallel(Matrix other)
         {
             if (other == null)
@@ -88,7 +84,7 @@ namespace MatrixMultiplying
             {
                 throw new ArgumentException($"Row count of {nameof(other)} matrix should be {Elements.GetLength(1)}.");
             }
-            
+
             var resultMatrix = new int[Elements.GetLength(0), other.Elements.GetLength(1)];
 
             Parallel.For(0, resultMatrix.GetLength(0), currentRow =>
@@ -101,6 +97,17 @@ namespace MatrixMultiplying
             });
 
             return new Matrix(resultMatrix);
+        }
+
+        private int CalculateElementOfResultMatrix(int rowNumber, int columnNumber, Matrix other)
+        {
+            var resultValue = 0;
+            for (var i = 0; i < Elements.GetLength(1); i++)
+            {
+                resultValue += Elements[rowNumber, i] * other.Elements[i, columnNumber];
+            }
+
+            return resultValue;
         }
     }
 }
