@@ -2,10 +2,22 @@
 
 namespace MatrixMultiplying
 {
+    /// <summary>
+    /// Represents a table of numbers. Provides methods to multiply matrices.
+    /// </summary>
     public class Matrix
     {
+        /// <summary>
+        /// Elements of matrix.
+        /// </summary>
         public int[,] Elements { get; }
         
+        /// <summary>
+        /// Initialize new instance of <see cref="Matrix"/> class with specified elements.
+        /// </summary>
+        /// <param name="elements">Specified elements of matrix.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="elements"/> is <code>null</code>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="elements"/> is empty.</exception>
         public Matrix(int[,] elements)
         {
             if (elements == null)
@@ -21,6 +33,13 @@ namespace MatrixMultiplying
             Elements = elements;
         }
 
+        /// <summary>
+        /// Returns result from multiplying this matrix with <paramref name="other"/> matrix.
+        /// </summary>
+        /// <param name="other">Second factor of matrix multiplying.</param>
+        /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <code>null</code>.</exception>
+        /// <exception cref="ArgumentException">Row count of <paramref name="other"/> matrix is not equal to column count of this matrix.</exception>
         public Matrix MultiplyWith(Matrix other)
         {
             if (other == null)
@@ -48,7 +67,6 @@ namespace MatrixMultiplying
             
             return new Matrix(resultMatrix);
         }
-        
         // public Matrix MultiplyWithAsync(Matrix other)
         // {}
     }
