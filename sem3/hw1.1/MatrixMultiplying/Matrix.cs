@@ -73,7 +73,7 @@ namespace MatrixMultiplying
         /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <code>null</code>.</exception>
         /// <exception cref="ArgumentException">Row count of <paramref name="other"/> matrix is not equal to column count of this matrix.</exception>
-        public Matrix MultiplyWithParallel(Matrix other)
+        public Matrix ParallelMultiplyWith(Matrix other)
         {
             if (other == null)
             {
@@ -86,7 +86,7 @@ namespace MatrixMultiplying
             }
 
             var resultMatrix = new int[Elements.GetLength(0), other.Elements.GetLength(1)];
-
+            
             Parallel.For(0, resultMatrix.GetLength(0), currentRow =>
             {
                 for (var currentColumn = 0; currentColumn < resultMatrix.GetLength(1); currentColumn++)
@@ -97,6 +97,32 @@ namespace MatrixMultiplying
             });
 
             return new Matrix(resultMatrix);
+        }
+        
+        public static Matrix GenerateRandomMatrix(int rowCount, int columnCount)
+        {
+            if (rowCount <= 0)
+            {
+                throw new ArgumentException($"{nameof(rowCount)} should be positive number.");
+            }
+
+            if (columnCount <= 0)
+            {
+                throw new ArgumentException($"{nameof(columnCount)} should be positive number.");
+            }
+
+            var matrix = new int[rowCount, columnCount];
+            var random = new Random(DateTime.Now.Millisecond);
+
+            for (var i = 0; i < rowCount; i++)
+            {
+                for (var j = 0; j < columnCount; j++)
+                {
+                    matrix[i, j] = random.Next(int.MinValue, int.MaxValue);
+                }
+            }
+            
+            return new Matrix(matrix);
         }
 
         private int CalculateElementOfResultMatrix(int rowNumber, int columnNumber, Matrix other)

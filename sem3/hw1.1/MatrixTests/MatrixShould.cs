@@ -84,7 +84,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1,1]);
             
-            Assert.That(() => matrix.MultiplyWithParallel(null), Throws.ArgumentNullException);
+            Assert.That(() => matrix.ParallelMultiplyWith(null), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1, 1]);
 
-            Assert.That(() => matrix.MultiplyWithParallel(new Matrix(new int[2, 1])), Throws.ArgumentException);
+            Assert.That(() => matrix.ParallelMultiplyWith(new Matrix(new int[2, 1])), Throws.ArgumentException);
         }
 
         [TestCaseSource(nameof(ArgumentsForMultiplyingAndExpectedResultCases))]
@@ -102,7 +102,7 @@ namespace MatrixTests
         {
             var (firstFactor, secondFactor, expectedResult) = argumentsForMultiplyingAndExpectedResultCase;
 
-            var actualResult = firstFactor.MultiplyWithParallel(secondFactor);
+            var actualResult = firstFactor.ParallelMultiplyWith(secondFactor);
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
         }
@@ -112,7 +112,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1,1]);
             
-            Assert.That(() => matrix.MultiplyWithParallel(null), Throws.ArgumentNullException);
+            Assert.That(() => matrix.ParallelMultiplyWith(null), Throws.ArgumentNullException);
         }
 
         [Test]
