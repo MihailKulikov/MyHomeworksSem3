@@ -176,10 +176,8 @@ namespace MatrixTests
         [Test]
         public void Throw_ArgumentException_When_Trying_To_Read_Matrix_From_File_That_Does_Not_Exist()
         {
-            const string exceptionMessage = "File with specified path does not exist.";
-            
             Assert.That(() => Matrix.ReadMatrixFromFileAsync(""),
-                Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
+                Throws.ArgumentException);
         }
 
         [Test]
