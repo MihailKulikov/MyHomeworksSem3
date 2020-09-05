@@ -180,10 +180,12 @@ namespace MatrixMultiplying
             var rows = new string[Elements.GetLength(0)];
             for (var i = 0; i < Elements.GetLength(0); i++)
             {
-                for (var j = 0; j < Elements.GetLength(1); j++)
+                for (var j = 0; j < Elements.GetLength(1) - 1; j++)
                 {
                     rows[i] += Elements[i, j] + " ";
                 }
+
+                rows[i] += Elements[i, Elements.GetLength(1) - 1];
             }
 
             await File.WriteAllLinesAsync(fileName, rows);
@@ -191,7 +193,7 @@ namespace MatrixMultiplying
             return fileName;
         }
 
-        public async Task<string> ReadTwoMatricesFromFileAndWriteResultFromMultiplyingToNewFileAsync(string firstPath,
+        public static async Task<string> ReadTwoMatricesFromFileAndWriteResultFromMultiplyingToNewFileAsync(string firstPath,
             string secondPath)
         {
             var firstMatrix = await ReadMatrixFromFileAsync(firstPath);

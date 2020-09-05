@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using MatrixMultiplying;
 using NUnit.Framework;
 
@@ -9,7 +10,8 @@ namespace MatrixTests
     public class MatrixShould
     {
         private Matrix matrix;
-        private const string Path = "test.txt";
+        private const string FirstPath = "test1.txt";
+        private const string SecondPath = "test2.txt";
 
         private static IEnumerable<(Matrix firstFactor, Matrix secondFactor, Matrix expectedResult)>
             ArgumentsForMultiplyingAndExpectedResultCases
@@ -50,7 +52,8 @@ namespace MatrixTests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            File.Delete(Path);
+            File.Delete(FirstPath);
+            File.Delete(SecondPath);
         }
         
         [Test]
@@ -182,35 +185,70 @@ namespace MatrixTests
         [Test]
         public void Throw_ArgumentException_When_Trying_To_Read_Matrix_From_Empty_File()
         {
-            File.WriteAllText(Path, "");
+            File.WriteAllText(FirstPath, "");
             const string exceptionMessage = "File is empty.";
             
-            Assert.That(() => Matrix.ReadMatrixFromFileAsync(Path),
+            Assert.That(() => Matrix.ReadMatrixFromFileAsync(FirstPath),
                 Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
         }
 
         [Test]
         public void Throw_ArgumentException_When_Trying_To_Read_Incorrect_Matrix_From_File()
         {
-            File.WriteAllLines(Path, new[]{"4 2", "1"});
+            File.WriteAllLines(FirstPath, new[]{"4 2", "1"});
             const string exceptionMessage = "Matrix has incorrect format.";
 
-            Assert.That(() => Matrix.ReadMatrixFromFileAsync(Path),
+            Assert.That(() => Matrix.ReadMatrixFromFileAsync(FirstPath),
                 Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
         }
 
         [Test]
-        public void Read_Matrix_From_File()
+        public async Task Read_Matrix_From_File()
         {
             var rows = new[] {"4 2", "5 4", "1 1"};
-            File.WriteAllLines(Path,rows);
+            File.WriteAllLines(FirstPath,rows);
 
-            var result = Matrix.ReadMatrixFromFileAsync(Path).Result;
+            var result = await Matrix.ReadMatrixFromFileAsync(FirstPath);
             
             Assert.That(result.Elements,
                 Is.EquivalentTo(rows.SelectMany(row => row.Split(' ').Select(int.Parse))));
             Assert.That(result.Elements.GetLength(0) == rows.Length);
             Assert.That(result.Elements.GetLength(1) == 2);
+        }
+
+        [Test]
+        public async Task Write_Matrix_To_File()
+        {
+            matrix = new Matrix(new[,]
+            {
+                {4, 2},
+                {5, 4},
+                {6, 6}
+            });
+            var expectedResult = new[] {"4 2", "5 4", "6 6"};
+
+            var path = await matrix.WriteMatrixToNewFileAsync();
+
+            Assert.That(await File.ReadAllLinesAsync(path), Is.EquivalentTo(expectedResult));
+            
+            File.Delete(path);
+        }
+
+        [Test]
+        public async Task Read_Two_Matrices_From_File_And_Write_Result_From_Multiplying_To_New_File()
+        {
+            var firstMatrixRows = new[] {"4 2", "5 4", "1 1"};
+            File.WriteAllLines(FirstPath, firstMatrixRows);
+            var secondMatrixRows = new[] {"1", "1"};
+            File.WriteAllLines(SecondPath, secondMatrixRows);
+            var expectedResult = new[] {"6", "9", "2"};
+
+            var path = await Matrix.ReadTwoMatricesFromFileAndWriteResultFromMultiplyingToNewFileAsync(FirstPath,
+                SecondPath);
+
+            Assert.That(await File.ReadAllLinesAsync(path), Is.EquivalentTo(expectedResult));
+            
+            File.Delete(path);
         }
     }
 }
