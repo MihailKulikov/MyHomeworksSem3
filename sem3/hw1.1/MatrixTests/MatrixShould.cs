@@ -49,8 +49,8 @@ namespace MatrixTests
             }
         }
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
             File.Delete(FirstPath);
             File.Delete(SecondPath);
