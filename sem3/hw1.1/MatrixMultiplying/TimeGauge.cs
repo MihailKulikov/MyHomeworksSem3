@@ -9,7 +9,7 @@ namespace MatrixMultiplying
     public static class TimeGauge
     {
         /// <summary>
-        /// Calculate elapsed time of specified func.
+        /// Calculate elapsed time of specified func invocation.
         /// </summary>
         /// <param name="measurableFunc">The specified func.</param>
         /// <param name="arg">Func argument for invocation.</param>

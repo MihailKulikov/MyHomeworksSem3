@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using MatrixMultiplying;
 using NUnit.Framework;
 
@@ -7,6 +9,7 @@ namespace MatrixTests
     public class MatrixShould
     {
         private Matrix matrix;
+        private const string Path = "test.txt";
 
         private static IEnumerable<(Matrix firstFactor, Matrix secondFactor, Matrix expectedResult)>
             ArgumentsForMultiplyingAndExpectedResultCases
@@ -44,6 +47,12 @@ namespace MatrixTests
             }
         }
 
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            File.Delete(Path);
+        }
+        
         [Test]
         public void Throw_ArgumentNullException_When_Initializing_With_Null()
         {
@@ -100,6 +109,8 @@ namespace MatrixTests
             var actualResult = firstFactor.ParallelMultiplyWith(secondFactor);
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
+            Assert.That(actualResult.Elements.GetLength(0) == expectedResult.Elements.GetLength(0));
+            Assert.That(actualResult.Elements.GetLength(1) == expectedResult.Elements.GetLength(1));
         }
         
         [Test]
@@ -107,7 +118,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1,1]);
             
-            Assert.That(() => matrix.ParallelMultiplyWith(null), Throws.ArgumentNullException);
+            Assert.That(() => matrix.MultiplyWith(null), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -123,14 +134,13 @@ namespace MatrixTests
         public void Return_Correct_Result_From_Multiplying_With_Other_Matrix(
             (Matrix firstFactor, Matrix secondFactor, Matrix result) argumentsForMultiplyingAndExpectedResultCase)
         {
-            var (firstFactor, secondFactor, expectedResult) = (
-                argumentsForMultiplyingAndExpectedResultCase.firstFactor,
-                argumentsForMultiplyingAndExpectedResultCase.secondFactor,
-                argumentsForMultiplyingAndExpectedResultCase.result);
+            var (firstFactor, secondFactor, expectedResult) = argumentsForMultiplyingAndExpectedResultCase;
 
             var actualResult = firstFactor.MultiplyWith(secondFactor);
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
+            Assert.That(actualResult.Elements.GetLength(0) == expectedResult.Elements.GetLength(0));
+            Assert.That(actualResult.Elements.GetLength(1) == expectedResult.Elements.GetLength(1));
         }
 
         [Test]
@@ -152,6 +162,55 @@ namespace MatrixTests
 
             Assert.That(generatedMatrix.Elements.GetLength(0) == 42);
             Assert.That(generatedMatrix.Elements.GetLength(1) == 2);
+        }
+
+        [Test]
+        public void Throw_ArgumentNullException_When_Trying_To_Read_Matrix_From_Null_Path()
+        {
+            Assert.That(() => Matrix.ReadMatrixFromFileAsync(null), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        public void Throw_ArgumentException_When_Trying_To_Read_Matrix_From_File_That_Does_Not_Exist()
+        {
+            const string exceptionMessage = "File with specified path does not exist.";
+            
+            Assert.That(() => Matrix.ReadMatrixFromFileAsync(""),
+                Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
+        }
+
+        [Test]
+        public void Throw_ArgumentException_When_Trying_To_Read_Matrix_From_Empty_File()
+        {
+            File.WriteAllText(Path, "");
+            const string exceptionMessage = "File is empty.";
+            
+            Assert.That(() => Matrix.ReadMatrixFromFileAsync(Path),
+                Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
+        }
+
+        [Test]
+        public void Throw_ArgumentException_When_Trying_To_Read_Incorrect_Matrix_From_File()
+        {
+            File.WriteAllLines(Path, new[]{"4 2", "1"});
+            const string exceptionMessage = "Matrix has incorrect format.";
+
+            Assert.That(() => Matrix.ReadMatrixFromFileAsync(Path),
+                Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
+        }
+
+        [Test]
+        public void Read_Matrix_From_File()
+        {
+            var rows = new[] {"4 2", "5 4", "1 1"};
+            File.WriteAllLines(Path,rows);
+
+            var result = Matrix.ReadMatrixFromFileAsync(Path).Result;
+            
+            Assert.That(result.Elements,
+                Is.EquivalentTo(rows.SelectMany(row => row.Split(' ').Select(int.Parse))));
+            Assert.That(result.Elements.GetLength(0) == rows.Length);
+            Assert.That(result.Elements.GetLength(1) == 2);
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MatrixMultiplying
@@ -25,7 +27,7 @@ namespace MatrixMultiplying
             {
                 throw new ArgumentNullException(nameof(elements));
             }
-
+            
             if (elements.GetLength(0) == 0 || elements.GetLength(1) == 0)
             {
                 throw new ArgumentException($"{nameof(elements)} should not be empty.");
@@ -119,7 +121,7 @@ namespace MatrixMultiplying
             }
 
             var matrix = new int[rowCount, columnCount];
-            var random = new Random(DateTime.Now.Millisecond);
+            var random = new Random();
 
             for (var i = 0; i < rowCount; i++)
             {
@@ -130,6 +132,72 @@ namespace MatrixMultiplying
             }
             
             return new Matrix(matrix);
+        }
+
+        public static async Task<Matrix> ReadMatrixFromFileAsync(string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            
+            if (!File.Exists(path))
+            {
+                throw new ArgumentException("File with specified path does not exist.");
+            }
+
+            var rows = await File.ReadAllLinesAsync(path);
+
+            if (rows.Length == 0)
+            {
+                throw new ArgumentException("File is empty.");
+            }
+
+            var matrixFromFile = rows.Select(row => row.Split(' ').Select(int.Parse).ToArray()).ToArray();
+            var expectedColumnCount = matrixFromFile[0].Length;
+
+            if (matrixFromFile.Any(row => row.Length != expectedColumnCount))
+            {
+                throw new ArgumentException("Matrix has incorrect format.");
+            }
+
+            var matrix = new int[matrixFromFile.Length, expectedColumnCount];
+            for (var i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (var j = 0; j < matrix.GetLength(1); j++)
+                {
+                    matrix[i, j] = matrixFromFile[i][j];
+                }
+            }
+            
+            return new Matrix(matrix);
+        }
+
+        public async Task<string> WriteMatrixToNewFileAsync()
+        {
+            var fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".txt";
+
+            var rows = new string[Elements.GetLength(0)];
+            for (var i = 0; i < Elements.GetLength(0); i++)
+            {
+                for (var j = 0; j < Elements.GetLength(1); j++)
+                {
+                    rows[i] += Elements[i, j] + " ";
+                }
+            }
+
+            await File.WriteAllLinesAsync(fileName, rows);
+
+            return fileName;
+        }
+
+        public async Task<string> ReadTwoMatricesFromFileAndWriteResultFromMultiplyingToNewFileAsync(string firstPath,
+            string secondPath)
+        {
+            var firstMatrix = await ReadMatrixFromFileAsync(firstPath);
+            var secondMatrix = await ReadMatrixFromFileAsync(secondPath);
+
+            return await firstMatrix.ParallelMultiplyWith(secondMatrix).WriteMatrixToNewFileAsync();
         }
 
         private int CalculateElementOfResultMatrix(int rowNumber, int columnNumber, Matrix other)
