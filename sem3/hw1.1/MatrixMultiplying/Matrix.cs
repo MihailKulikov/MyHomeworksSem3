@@ -134,18 +134,14 @@ namespace MatrixMultiplying
             return new Matrix(matrix);
         }
 
+        /// <summary>
+        /// Asynchronously opens a text file, reads matrix from the file, and then closes the file.
+        /// </summary>
+        /// <param name="path">The file to open for reading.</param>
+        /// <returns>A matrix with elements from the file.</returns>
+        /// <exception cref="ArgumentException">File is empty; matrix has incorrect format.</exception>
         public static async Task<Matrix> ReadMatrixFromFileAsync(string path)
         {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            
-            if (!File.Exists(path))
-            {
-                throw new ArgumentException("File with specified path does not exist.");
-            }
-
             var rows = await File.ReadAllLinesAsync(path);
 
             if (rows.Length == 0)
@@ -173,6 +169,10 @@ namespace MatrixMultiplying
             return new Matrix(matrix);
         }
 
+        /// <summary>
+        /// Asynchronously creates a new file, writes the matrix to the file, and then closes the file.
+        /// </summary>
+        /// <returns>The file's path.</returns>
         public async Task<string> WriteMatrixToNewFileAsync()
         {
             var fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".txt";
@@ -193,6 +193,12 @@ namespace MatrixMultiplying
             return fileName;
         }
 
+        /// <summary>
+        /// Asynchronously opens two text files, reads matrices from the files, multiply them, writes result to the new file, and then closes all files.
+        /// </summary>
+        /// <param name="firstPath">The first file to open for reading.</param>
+        /// <param name="secondPath">The second file to open for reading.</param>
+        /// <returns>The path of file with result of matrix multiplication.</returns>
         public static async Task<string> ReadTwoMatricesFromFileAndWriteResultFromMultiplyingToNewFileAsync(string firstPath,
             string secondPath)
         {
