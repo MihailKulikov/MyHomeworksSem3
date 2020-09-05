@@ -4,14 +4,9 @@ using NUnit.Framework;
 
 namespace MatrixTests
 {
-    public class Tests
+    public class MatrixShould
     {
         private Matrix matrix;
-
-        [SetUp]
-        public void Setup()
-        {
-        }
 
         private static IEnumerable<(Matrix firstFactor, Matrix secondFactor, Matrix expectedResult)>
             ArgumentsForMultiplyingAndExpectedResultCases
