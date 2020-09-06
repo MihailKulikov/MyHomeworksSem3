@@ -28,7 +28,7 @@ namespace MatrixMultiplying
             {
                 throw new ArgumentNullException(nameof(elements));
             }
-            
+
             if (elements.GetLength(0) == 0 || elements.GetLength(1) == 0)
             {
                 throw new ArgumentException($"{nameof(elements)} should not be empty.");
@@ -61,7 +61,7 @@ namespace MatrixMultiplying
 
             return new Matrix(resultMatrix);
         }
-        
+
         /// <summary>
         /// Calculates result from multiplying this matrix with <paramref name="other"/> matrix with using multiple threads.
         /// </summary>
@@ -82,7 +82,7 @@ namespace MatrixMultiplying
             }
 
             var resultMatrix = new int[Elements.GetLength(0), other.Elements.GetLength(1)];
-            
+
             Parallel.For(0, resultMatrix.GetLength(0), currentRow =>
             {
                 for (var currentColumn = 0; currentColumn < resultMatrix.GetLength(1); currentColumn++)
@@ -137,7 +137,7 @@ namespace MatrixMultiplying
                             other);
                     });
                 }
-                
+
                 threads[currentThread].Start();
             }
 
@@ -145,7 +145,7 @@ namespace MatrixMultiplying
             {
                 thread.Join();
             }
-            
+
             return new Matrix(resultMatrix);
         }
 
@@ -178,7 +178,7 @@ namespace MatrixMultiplying
                     matrix[i, j] = random.Next(int.MinValue, int.MaxValue);
                 }
             }
-            
+
             return new Matrix(matrix);
         }
 
@@ -213,7 +213,7 @@ namespace MatrixMultiplying
                     matrix[i, j] = matrixFromFile[i][j];
                 }
             }
-            
+
             return new Matrix(matrix);
         }
 
@@ -247,7 +247,8 @@ namespace MatrixMultiplying
         /// <param name="firstPath">The first file to open for reading.</param>
         /// <param name="secondPath">The second file to open for reading.</param>
         /// <returns>The path of file with result of matrix multiplication.</returns>
-        public static async Task<string> ReadTwoMatricesFromFileAndWriteResultFromMultiplyingToNewFileAsync(string firstPath,
+        public static async Task<string> ReadTwoMatricesFromFileAndWriteResultFromMultiplyingToNewFileAsync(
+            string firstPath,
             string secondPath)
         {
             var firstMatrix = await ReadMatrixFromFileAsync(firstPath);
@@ -266,18 +267,21 @@ namespace MatrixMultiplying
 
             return resultValue;
         }
-        
+
         private void CalculateSpecifiedElementsOfResultMatrix(int[,] resultMatrix, int startRow, int startColumn,
             int rowStep, int columnStep, Matrix other)
         {
-            for (var currentRow = startRow; currentRow < resultMatrix.GetLength(0); currentRow+=rowStep)
+            for (var currentRow = startRow; currentRow < resultMatrix.GetLength(0); currentRow += rowStep)
             {
-                for (var currentColumn = startColumn; currentColumn < resultMatrix.GetLength(1); currentColumn+=columnStep)
+                for (var currentColumn = startColumn;
+                    currentColumn < resultMatrix.GetLength(1);
+                    currentColumn += columnStep)
                 {
                     resultMatrix[currentRow, currentColumn] =
                         CalculateElementOfResultMatrix(currentRow, currentColumn, other);
                 }
             }
+
         }
     }
 }
