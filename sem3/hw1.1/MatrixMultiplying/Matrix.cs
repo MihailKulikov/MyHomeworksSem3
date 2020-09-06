@@ -69,7 +69,7 @@ namespace MatrixMultiplying
         /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <code>null</code>.</exception>
         /// <exception cref="ArgumentException">Row count of <paramref name="other"/> matrix is not equal to column count of this matrix.</exception>
-        public Matrix ParallelForMultiplyWith(Matrix other)
+        public Matrix MultiplyWithUsingParallelFor(Matrix other)
         {
             if (other == null)
             {
@@ -102,7 +102,7 @@ namespace MatrixMultiplying
         /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <code>null</code>.</exception>
         /// <exception cref="ArgumentException">Row count of <paramref name="other"/> matrix is not equal to column count of this matrix.</exception>
-        public Matrix MyVersionOfParallelMultiplyWith(Matrix other)
+        public Matrix ParallelMultiplyWithUsingThreads(Matrix other)
         {
             if (other == null)
             {
@@ -253,7 +253,7 @@ namespace MatrixMultiplying
             var firstMatrix = await ReadMatrixFromFileAsync(firstPath);
             var secondMatrix = await ReadMatrixFromFileAsync(secondPath);
 
-            return await firstMatrix.MyVersionOfParallelMultiplyWith(secondMatrix).WriteMatrixToNewFileAsync();
+            return await firstMatrix.ParallelMultiplyWithUsingThreads(secondMatrix).WriteMatrixToNewFileAsync();
         }
 
         private int CalculateElementOfResultMatrix(int rowNumber, int columnNumber, Matrix other)

@@ -91,7 +91,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1,1]);
             
-            Assert.That(() => matrix.ParallelForMultiplyWith(null), Throws.ArgumentNullException);
+            Assert.That(() => matrix.MultiplyWithUsingParallelFor(null), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1, 1]);
 
-            Assert.That(() => matrix.ParallelForMultiplyWith(new Matrix(new int[2, 1])), Throws.ArgumentException);
+            Assert.That(() => matrix.MultiplyWithUsingParallelFor(new Matrix(new int[2, 1])), Throws.ArgumentException);
         }
 
         [TestCaseSource(nameof(ArgumentsForMultiplyingAndExpectedResultCases))]
@@ -109,7 +109,7 @@ namespace MatrixTests
         {
             var (firstFactor, secondFactor, expectedResult) = argumentsForMultiplyingAndExpectedResultCase;
 
-            var actualResult = firstFactor.ParallelForMultiplyWith(secondFactor);
+            var actualResult = firstFactor.MultiplyWithUsingParallelFor(secondFactor);
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
             Assert.That(actualResult.Elements.GetLength(0) == expectedResult.Elements.GetLength(0));
@@ -254,7 +254,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1,1]);
             
-            Assert.That(() => matrix.MyVersionOfParallelMultiplyWith(null), Throws.ArgumentNullException);
+            Assert.That(() => matrix.ParallelMultiplyWithUsingThreads(null), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -262,7 +262,7 @@ namespace MatrixTests
         {
             matrix = new Matrix(new int[1, 1]);
 
-            Assert.That(() => matrix.MyVersionOfParallelMultiplyWith(new Matrix(new int[2, 1])), Throws.ArgumentException);
+            Assert.That(() => matrix.ParallelMultiplyWithUsingThreads(new Matrix(new int[2, 1])), Throws.ArgumentException);
         }
 
         [TestCaseSource(nameof(ArgumentsForMultiplyingAndExpectedResultCases))]

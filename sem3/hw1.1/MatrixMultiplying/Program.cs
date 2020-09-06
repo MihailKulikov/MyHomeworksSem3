@@ -15,8 +15,8 @@ namespace MatrixMultiplying
                 var secondMatrix = Matrix.GenerateRandomMatrix(i, i);
 
                 var (myMultipleThreadElapsedTime, _) =
-                    TimeGauge.CalculateElapsedTime(firstMatrix.MyVersionOfParallelMultiplyWith, secondMatrix);
-                var (multipleThreadElapsedTime, _) = TimeGauge.CalculateElapsedTime(firstMatrix.ParallelForMultiplyWith,
+                    TimeGauge.CalculateElapsedTime(firstMatrix.ParallelMultiplyWithUsingThreads, secondMatrix);
+                var (multipleThreadElapsedTime, _) = TimeGauge.CalculateElapsedTime(firstMatrix.MultiplyWithUsingParallelFor,
                     secondMatrix);
 
                 Console.WriteLine($"{i}*{i} matrices: {100 * multipleThreadElapsedTime.TotalMilliseconds / myMultipleThreadElapsedTime.TotalMilliseconds}");
