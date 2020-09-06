@@ -8,23 +8,23 @@ namespace MatrixMultiplying
     /// </summary>
     public static class TimeGauge
     {
+        
         /// <summary>
         /// Calculate elapsed time of specified func invocation.
         /// </summary>
         /// <param name="measurableFunc">The specified func.</param>
         /// <param name="arg">Func argument for invocation.</param>
-        /// <param name="result">The result of the func invocation.</param>
         /// <typeparam name="TArg">The type of func parameter.</typeparam>
         /// <typeparam name="TRes">The type of the return value of the func.</typeparam>
-        /// <returns>Elapsed working time.</returns>
-        public static TimeSpan CalculateElapsedTime<TArg, TRes>(Func<TArg, TRes> measurableFunc, TArg arg, out TRes result)
+        /// <returns>Elapsed working time and the result of the func invocation.</returns>
+        public static (TimeSpan Elapsed, TRes Result) CalculateElapsedTime<TArg, TRes>(Func<TArg, TRes> measurableFunc, TArg arg)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            result = measurableFunc.Invoke(arg);
+            var result = measurableFunc.Invoke(arg);
             stopwatch.Stop();
 
-            return stopwatch.Elapsed;
+            return (stopwatch.Elapsed, result);
         }
     }
 }

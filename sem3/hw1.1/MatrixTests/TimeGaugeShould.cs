@@ -9,9 +9,9 @@ namespace MatrixTests
         [Test]
         public void Calculate_ElapsedTime()
         {
-            var elapsedTime = TimeGauge.CalculateElapsedTime(x => ++x, 1, out var result);
+            var (elapsed, result) = TimeGauge.CalculateElapsedTime(x => ++x, 1);
             
-            Assert.That(elapsedTime != TimeSpan.Zero);
+            Assert.That(elapsed != TimeSpan.Zero);
             Assert.That(result == 2);
         }
     }

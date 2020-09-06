@@ -14,10 +14,10 @@ namespace MatrixMultiplying
                 var firstMatrix = Matrix.GenerateRandomMatrix(i, i);
                 var secondMatrix = Matrix.GenerateRandomMatrix(i, i);
 
-                var myMultipleThreadElapsedTime =
-                    TimeGauge.CalculateElapsedTime(firstMatrix.MyVersionOfParallelMultiplyWith, secondMatrix, out _);
-                var multipleThreadElapsedTime = TimeGauge.CalculateElapsedTime(firstMatrix.ParallelForMultiplyWith,
-                    secondMatrix, out _);
+                var (myMultipleThreadElapsedTime, _) =
+                    TimeGauge.CalculateElapsedTime(firstMatrix.MyVersionOfParallelMultiplyWith, secondMatrix);
+                var (multipleThreadElapsedTime, _) = TimeGauge.CalculateElapsedTime(firstMatrix.ParallelForMultiplyWith,
+                    secondMatrix);
 
                 Console.WriteLine($"{i}*{i} matrices: {100 * multipleThreadElapsedTime.TotalMilliseconds / myMultipleThreadElapsedTime.TotalMilliseconds}");
             }
