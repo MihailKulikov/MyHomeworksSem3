@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MatrixMultiplying
@@ -75,7 +76,7 @@ namespace MatrixMultiplying
         /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <code>null</code>.</exception>
         /// <exception cref="ArgumentException">Row count of <paramref name="other"/> matrix is not equal to column count of this matrix.</exception>
-        public Matrix ParallelMultiplyWith(Matrix other)
+        public Matrix ParallelForMultiplyWith(Matrix other)
         {
             if (other == null)
             {
@@ -100,7 +101,75 @@ namespace MatrixMultiplying
 
             return new Matrix(resultMatrix);
         }
-        
+
+        /// <summary>
+        /// Calculates result from multiplying this matrix with <paramref name="other"/> matrix with using multiple threads.
+        /// </summary>
+        /// <param name="other">Second factor of matrix multiplying.</param>
+        /// <returns>Result from multiplying this matrix with <paramref name="other"/> matrix.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <code>null</code>.</exception>
+        /// <exception cref="ArgumentException">Row count of <paramref name="other"/> matrix is not equal to column count of this matrix.</exception>
+        public Matrix MyVersionOfParallelMultiplyWith(Matrix other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (Elements.GetLength(1) != other.Elements.GetLength(0))
+            {
+                throw new ArgumentException($"Row count of {nameof(other)} matrix should be {Elements.GetLength(1)}.");
+            }
+
+            var resultMatrix = new int[Elements.GetLength(0), other.Elements.GetLength(1)];
+            var maxSide = Math.Max(resultMatrix.GetLength(0), resultMatrix.GetLength(1));
+            var threads = new Thread[Math.Min(Environment.ProcessorCount, maxSide)];
+
+            for (var currentThread = 0; currentThread < threads.Length; currentThread++)
+            {
+                var localCurrentThread = currentThread;
+                if (resultMatrix.GetLength(0) == maxSide)
+                {
+                    threads[currentThread] = new Thread(() =>
+                    {
+                        for (var currentRow = localCurrentThread; currentRow < maxSide; currentRow+=threads.Length)
+                        {
+                            for (var currentColumn = 0; currentColumn < resultMatrix.GetLength(1); currentColumn++)
+                            {
+                                resultMatrix[currentRow, currentColumn] =
+                                    CalculateElementOfResultMatrix(currentRow, currentColumn, other);
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    threads[currentThread] = new Thread(() =>
+                    {
+                        for (var currentColumn = localCurrentThread;
+                            currentColumn < maxSide;
+                            currentColumn += threads.Length)
+                        {
+                            for (var currentRow = 0; currentRow < resultMatrix.GetLength(0); currentRow++)
+                            {
+                                resultMatrix[currentRow, currentColumn] =
+                                    CalculateElementOfResultMatrix(currentRow, currentColumn, other);
+                            }
+                        }
+                    });
+                }
+                
+                threads[currentThread].Start();
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+            
+            return new Matrix(resultMatrix);
+        }
+
         /// <summary>
         /// Generate new instance of <see cref="Matrix"/> class with random elements and specified row's and column's count.
         /// </summary>
@@ -205,7 +274,7 @@ namespace MatrixMultiplying
             var firstMatrix = await ReadMatrixFromFileAsync(firstPath);
             var secondMatrix = await ReadMatrixFromFileAsync(secondPath);
 
-            return await firstMatrix.ParallelMultiplyWith(secondMatrix).WriteMatrixToNewFileAsync();
+            return await firstMatrix.MyVersionOfParallelMultiplyWith(secondMatrix).WriteMatrixToNewFileAsync();
         }
 
         private int CalculateElementOfResultMatrix(int rowNumber, int columnNumber, Matrix other)
