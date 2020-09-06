@@ -87,7 +87,7 @@ namespace MatrixTests
         }
 
         [Test]
-        public void Throw_ArgumentNullException_When_Trying_To_MultiplyParallel_With_Null()
+        public void Throw_ArgumentNullException_When_Trying_To_Multiply_Using_ParallelFor_With_Null()
         {
             matrix = new Matrix(new int[1,1]);
             
@@ -95,7 +95,7 @@ namespace MatrixTests
         }
 
         [Test]
-        public void Throw_ArgumentException_When_Trying_To_MultiplyParallel_With_Matrix_With_Wrong_Row_Count()
+        public void Throw_ArgumentException_When_Trying_To_Multiply_Using_ParallelFor_With_Matrix_With_Wrong_Row_Count()
         {
             matrix = new Matrix(new int[1, 1]);
 
@@ -104,7 +104,7 @@ namespace MatrixTests
 
         [TestCaseSource(nameof(ArgumentsForMultiplyingAndExpectedResultCases))]
         [Test]
-        public void Return_Correct_Result_From_MultiplyingParallel_With_Other_Matrix(
+        public void Return_Correct_Result_From_Multiplying_Using_ParallelFor_With_Other_Matrix(
             (Matrix firstFactor, Matrix secondFactor, Matrix result) argumentsForMultiplyingAndExpectedResultCase)
         {
             var (firstFactor, secondFactor, expectedResult) = argumentsForMultiplyingAndExpectedResultCase;
@@ -247,6 +247,36 @@ namespace MatrixTests
             Assert.That(await File.ReadAllLinesAsync(path), Is.EquivalentTo(expectedResult));
             
             File.Delete(path);
+        }
+        
+        [Test]
+        public void Throw_ArgumentNullException_When_Trying_To_Multiply_Using_Threads_With_Null()
+        {
+            matrix = new Matrix(new int[1,1]);
+            
+            Assert.That(() => matrix.MyVersionOfParallelMultiplyWith(null), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        public void Throw_ArgumentException_When_Trying_To_Multiply_Using_Threads_With_Matrix_With_Wrong_Row_Count()
+        {
+            matrix = new Matrix(new int[1, 1]);
+
+            Assert.That(() => matrix.MyVersionOfParallelMultiplyWith(new Matrix(new int[2, 1])), Throws.ArgumentException);
+        }
+
+        [TestCaseSource(nameof(ArgumentsForMultiplyingAndExpectedResultCases))]
+        [Test]
+        public void Return_Correct_Result_From_Multiplying_Using_Threads_With_Other_Matrix(
+            (Matrix firstFactor, Matrix secondFactor, Matrix result) argumentsForMultiplyingAndExpectedResultCase)
+        {
+            var (firstFactor, secondFactor, expectedResult) = argumentsForMultiplyingAndExpectedResultCase;
+
+            var actualResult = firstFactor.MultiplyWith(secondFactor);
+
+            Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
+            Assert.That(actualResult.Elements.GetLength(0) == expectedResult.Elements.GetLength(0));
+            Assert.That(actualResult.Elements.GetLength(1) == expectedResult.Elements.GetLength(1));
         }
     }
 }
