@@ -57,14 +57,7 @@ namespace MatrixMultiplying
             }
 
             var resultMatrix = new int[Elements.GetLength(0), other.Elements.GetLength(1)];
-            for (var currentRow = 0; currentRow < resultMatrix.GetLength(0); currentRow++)
-            {
-                for (var currentColumn = 0; currentColumn < resultMatrix.GetLength(1); currentColumn++)
-                {
-                    resultMatrix[currentRow, currentColumn] =
-                        CalculateElementOfResultMatrix(currentRow, currentColumn, other);
-                }
-            }
+            CalculateSpecifiedElementsOfResultMatrix(resultMatrix, 0, 0, 1, 1, other);
 
             return new Matrix(resultMatrix);
         }
@@ -132,30 +125,16 @@ namespace MatrixMultiplying
                 {
                     threads[currentThread] = new Thread(() =>
                     {
-                        for (var currentRow = localCurrentThread; currentRow < maxSide; currentRow+=threads.Length)
-                        {
-                            for (var currentColumn = 0; currentColumn < resultMatrix.GetLength(1); currentColumn++)
-                            {
-                                resultMatrix[currentRow, currentColumn] =
-                                    CalculateElementOfResultMatrix(currentRow, currentColumn, other);
-                            }
-                        }
+                        CalculateSpecifiedElementsOfResultMatrix(resultMatrix, localCurrentThread, 0, threads.Length, 1,
+                            other);
                     });
                 }
                 else
                 {
                     threads[currentThread] = new Thread(() =>
                     {
-                        for (var currentColumn = localCurrentThread;
-                            currentColumn < maxSide;
-                            currentColumn += threads.Length)
-                        {
-                            for (var currentRow = 0; currentRow < resultMatrix.GetLength(0); currentRow++)
-                            {
-                                resultMatrix[currentRow, currentColumn] =
-                                    CalculateElementOfResultMatrix(currentRow, currentColumn, other);
-                            }
-                        }
+                        CalculateSpecifiedElementsOfResultMatrix(resultMatrix, 0, localCurrentThread, 1, threads.Length,
+                            other);
                     });
                 }
                 
@@ -286,6 +265,19 @@ namespace MatrixMultiplying
             }
 
             return resultValue;
+        }
+        
+        private void CalculateSpecifiedElementsOfResultMatrix(int[,] resultMatrix, int startRow, int startColumn,
+            int rowStep, int columnStep, Matrix other)
+        {
+            for (var currentRow = startRow; currentRow < resultMatrix.GetLength(0); currentRow+=rowStep)
+            {
+                for (var currentColumn = startColumn; currentColumn < resultMatrix.GetLength(1); currentColumn+=columnStep)
+                {
+                    resultMatrix[currentRow, currentColumn] =
+                        CalculateElementOfResultMatrix(currentRow, currentColumn, other);
+                }
+            }
         }
     }
 }
