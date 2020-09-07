@@ -1,0 +1,12 @@
+before_build:
+  - nuget restore %solution_name%
+  
+environment:
+  matrix:
+  - solution_name: sem3\hw1.1\hw1.1.sln
+  
+build_script:
+  - msbuild %solution_name%
+
+test_script:
+  - dotnet test %solution_name%
