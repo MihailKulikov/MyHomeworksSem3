@@ -112,8 +112,8 @@ namespace MatrixTests
             var actualResult = firstFactor.MultiplyWithUsingParallelFor(secondFactor);
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
-            Assert.That(actualResult.Elements.GetLength(0) == expectedResult.Elements.GetLength(0));
-            Assert.That(actualResult.Elements.GetLength(1) == expectedResult.Elements.GetLength(1));
+            Assert.That(actualResult.Elements.GetLength(0), Is.EqualTo(expectedResult.Elements.GetLength(0)));
+            Assert.That(actualResult.Elements.GetLength(1), Is.EqualTo(expectedResult.Elements.GetLength(1)));
         }
         
         [Test]
@@ -142,8 +142,8 @@ namespace MatrixTests
             var actualResult = firstFactor.MultiplyWith(secondFactor);
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
-            Assert.That(actualResult.Elements.GetLength(0) == expectedResult.Elements.GetLength(0));
-            Assert.That(actualResult.Elements.GetLength(1) == expectedResult.Elements.GetLength(1));
+            Assert.That(actualResult.Elements.GetLength(0), Is.EqualTo(expectedResult.Elements.GetLength(0)));
+            Assert.That(actualResult.Elements.GetLength(1), Is.EqualTo(expectedResult.Elements.GetLength(1)));
         }
 
         [Test]
@@ -163,8 +163,8 @@ namespace MatrixTests
         {
             var generatedMatrix = Matrix.GenerateRandomMatrix(42, 2);
 
-            Assert.That(generatedMatrix.Elements.GetLength(0) == 42);
-            Assert.That(generatedMatrix.Elements.GetLength(1) == 2);
+            Assert.That(generatedMatrix.Elements.GetLength(0), Is.EqualTo(42));
+            Assert.That(generatedMatrix.Elements.GetLength(1), Is.EqualTo(2));
         }
 
         [Test]
@@ -210,8 +210,8 @@ namespace MatrixTests
             
             Assert.That(result.Elements,
                 Is.EquivalentTo(rows.SelectMany(row => row.Split(' ').Select(int.Parse))));
-            Assert.That(result.Elements.GetLength(0) == rows.Length);
-            Assert.That(result.Elements.GetLength(1) == 2);
+            Assert.That(result.Elements.GetLength(0), Is.EqualTo(rows.Length));
+            Assert.That(result.Elements.GetLength(1), Is.EqualTo(2));
         }
 
         [Test]
@@ -275,8 +275,8 @@ namespace MatrixTests
             var actualResult = firstFactor.MultiplyWith(secondFactor);
 
             Assert.That(actualResult.Elements, Is.EquivalentTo(expectedResult.Elements));
-            Assert.That(actualResult.Elements.GetLength(0) == expectedResult.Elements.GetLength(0));
-            Assert.That(actualResult.Elements.GetLength(1) == expectedResult.Elements.GetLength(1));
+            Assert.That(actualResult.Elements.GetLength(0), Is.EqualTo(expectedResult.Elements.GetLength(0)));
+            Assert.That(actualResult.Elements.GetLength(1), Is.EqualTo(expectedResult.Elements.GetLength(1)));
         }
     }
 }
