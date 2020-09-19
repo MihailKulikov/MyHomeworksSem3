@@ -6,7 +6,6 @@ namespace LazyInitialization
     public class ThreadSafeLazy<T> : ILazy<T>
     {
         private volatile bool isValueCreated;
-        private readonly Mutex mutex = new Mutex();
         private readonly Func<T> supplier;
         private T value;
 
@@ -18,6 +17,7 @@ namespace LazyInitialization
         public T Get()
         {
             if (isValueCreated) return value;
+            using var mutex = new Mutex();
             mutex.WaitOne();
             if (!isValueCreated)
             {
