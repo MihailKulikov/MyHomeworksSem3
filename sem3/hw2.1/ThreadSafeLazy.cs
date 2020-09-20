@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 namespace LazyInitialization
 {
@@ -12,7 +11,7 @@ namespace LazyInitialization
         private volatile bool isValueCreated;
         private readonly Func<T> supplier;
         private T value;
-        private readonly Mutex mutex = new Mutex();
+        private readonly object isValueCreatedLock = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadSafeLazy{T}"/> class. When lazy initialization occurs, the specified initialization function is used.
@@ -26,26 +25,14 @@ namespace LazyInitialization
         public T Get()
         {
             if (isValueCreated) return value;
-            try
+            lock (isValueCreatedLock)
             {
-                mutex.WaitOne();
-                if (!isValueCreated)
-                {
-                    value = supplier.Invoke();
-                    isValueCreated = true;
-                }
-            }
-            finally
-            {
-                mutex.ReleaseMutex();
+                if (isValueCreated) return value;
+                value = supplier.Invoke();
+                isValueCreated = true;
             }
 
             return value;
-        }
-        
-        ~ThreadSafeLazy()
-        {
-            mutex.Dispose();
         }
     }
 }
