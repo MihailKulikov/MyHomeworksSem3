@@ -6,13 +6,13 @@ namespace LazyInitializationTests
     public class LazyFactoryShould
     {
         [Test]
-        public void Throw_ArgumentNullException_When_Create_Lazy_With_Null_Supplier()
+        public void Throw_ArgumentNullException_When_Creating_Lazy_With_Null_Supplier()
         {
             Assert.That(() => LazyFactory.CreateLazy<object>(null), Throws.ArgumentNullException);
         }
 
         [Test]
-        public void Throw_ArgumentNullException_When_Create_ThreadSafeLazy_With_Null_Supplier()
+        public void Throw_ArgumentNullException_When_Creating_ThreadSafeLazy_With_Null_Supplier()
         {
             Assert.That(() => LazyFactory.CreateThreadSafeLazy<object>(null), Throws.ArgumentNullException);
         }
@@ -40,6 +40,8 @@ namespace LazyInitializationTests
             var secondLazy = LazyFactory.CreateLazy(() => new int());
             
             Assert.That(firstLazy, Is.Not.EqualTo(secondLazy));
+            Assert.That(firstLazy, Is.TypeOf<Lazy<int>>());
+            Assert.That(secondLazy, Is.TypeOf<Lazy<int>>());
         }
 
         [Test]
@@ -49,6 +51,8 @@ namespace LazyInitializationTests
             var secondLazy = LazyFactory.CreateThreadSafeLazy(() => new int());
             
             Assert.That(firstLazy, Is.Not.EqualTo(secondLazy));
+            Assert.That(firstLazy, Is.TypeOf<ThreadSafeLazy<int>>());
+            Assert.That(secondLazy, Is.TypeOf<ThreadSafeLazy<int>>());
         }
     }
 }
