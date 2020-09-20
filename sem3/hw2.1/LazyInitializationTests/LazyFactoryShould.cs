@@ -22,7 +22,7 @@ namespace LazyInitializationTests
         {
             var lazy = LazyFactory.CreateLazy(() => new int());
 
-            Assert.That(lazy, Is.TypeOf<Lazy<int>>());
+            Assert.That(lazy, Is.TypeOf<NotThreadSafeLazy<int>>());
         }
 
         [Test]
@@ -40,8 +40,8 @@ namespace LazyInitializationTests
             var secondLazy = LazyFactory.CreateLazy(() => new int());
             
             Assert.That(firstLazy, Is.Not.EqualTo(secondLazy));
-            Assert.That(firstLazy, Is.TypeOf<Lazy<int>>());
-            Assert.That(secondLazy, Is.TypeOf<Lazy<int>>());
+            Assert.That(firstLazy, Is.TypeOf<NotThreadSafeLazy<int>>());
+            Assert.That(secondLazy, Is.TypeOf<NotThreadSafeLazy<int>>());
         }
 
         [Test]

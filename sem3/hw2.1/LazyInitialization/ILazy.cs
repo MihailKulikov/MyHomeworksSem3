@@ -11,7 +11,5 @@
         /// </summary>
         /// <returns>The lazily initialized value of the current <see cref="ILazy{T}"/> instance.</returns>
         T Get();
-        
-        //TODO: InvalidOperationException(The initialization function tries to access Value on this instance.)
     }
 }
