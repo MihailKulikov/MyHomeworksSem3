@@ -16,9 +16,10 @@ namespace LazyInitialization
         /// Initializes a new instance of the <see cref="Lazy{T}"/> class. When lazy initialization occurs, the specified initialization function is used.
         /// </summary>
         /// <param name="supplier">The delegate that is invoked to produce the lazily initialized value when it is needed.</param>
+        /// <exception cref="ArgumentNullException"><param name="supplier"></param> is null.</exception>
         public Lazy(Func<T> supplier)
         {
-            this.supplier = supplier;
+            this.supplier = supplier ?? throw new ArgumentNullException(nameof(supplier));
         }
         
         public T Get()
