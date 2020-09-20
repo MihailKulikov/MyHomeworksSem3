@@ -9,7 +9,7 @@ namespace LazyInitialization
     public class ThreadSafeLazy<T> : ILazy<T>
     {
         private volatile bool isValueCreated;
-        private readonly Func<T> supplier;
+        private Func<T> supplier;
         private T value;
         private readonly object isValueCreatedLock = new object();
 
@@ -23,13 +23,25 @@ namespace LazyInitialization
             this.supplier = supplier ?? throw new ArgumentNullException(nameof(supplier));
         }
         
+        /// <summary>
+        /// Gets the lazily initialized value of the current <see cref="ThreadSafeLazy{T}"/> instance.
+        /// </summary>
+        /// <returns>The lazily initialized value of the current <see cref="ThreadSafeLazy{T}"/> instance.</returns>
+        /// <exception cref="InvalidOperationException">The initialization function tries to call method Get of this instance.</exception>
         public T Get()
         {
             if (isValueCreated) return value;
             lock (isValueCreatedLock)
             {
                 if (isValueCreated) return value;
-                value = supplier.Invoke();
+                var localSupplier = supplier;
+                if (localSupplier == null)
+                {
+                    throw new InvalidOperationException("Recursive calls Get().");
+                }
+
+                supplier = null;
+                value = localSupplier();
                 isValueCreated = true;
             }
 
