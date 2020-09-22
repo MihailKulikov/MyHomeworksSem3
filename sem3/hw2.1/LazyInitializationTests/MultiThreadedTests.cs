@@ -9,6 +9,7 @@ namespace LazyInitializationTests
         private volatile int callsCount;
         private ThreadSafeLazy<object> threadSafeLazy;
         private readonly object expectedObject = new object();
+        private readonly CountdownEvent countdownEvent = new CountdownEvent(1);
 
         [SetUp]
         public void SetUp()
@@ -20,7 +21,6 @@ namespace LazyInitializationTests
         public void ThreadSafeLazy_Should_Get_Value_Concurrent_In_Different_Threads_Without_Races()
         {
             const int threadCount = 10;
-            var countdownEvent = new CountdownEvent(1);
             threadSafeLazy = new ThreadSafeLazy<object>(() =>
             {
                 Interlocked.Increment(ref callsCount);
@@ -52,6 +52,12 @@ namespace LazyInitializationTests
             {
                 Assert.That(actualObject, Is.EqualTo(expectedObject));
             }
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            countdownEvent.Dispose();
         }
     }
 }
