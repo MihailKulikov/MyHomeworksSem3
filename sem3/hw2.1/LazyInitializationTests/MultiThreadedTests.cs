@@ -41,14 +41,13 @@ namespace LazyInitializationTests
                 
                 threads[i].Start();
             }
-
             countdownEvent.Signal();
             foreach (var thread in threads)
             {
                 thread.Join();
             }
             
-            Assert.IsTrue(callsCount == 1);
+            Assert.That(callsCount, Is.EqualTo(1));
             foreach (var actualObject in actualObjects)
             {
                 Assert.That(actualObject, Is.EqualTo(expectedObject));
