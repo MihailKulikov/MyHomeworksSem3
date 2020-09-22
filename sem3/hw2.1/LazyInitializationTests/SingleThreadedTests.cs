@@ -51,14 +51,14 @@ namespace LazyInitializationTests
         }
 
         [Test]
-        public void Throw_ArgumentNullException_When_Trying_To_Initialize_With_Null_Supplier()
+        public void Should_Throw_ArgumentNullException_When_Trying_To_Initialize_With_Null_Supplier()
         {
             Assert.That(() => initializer(null), Throws.ArgumentNullException);
         }
         
         [TestCaseSource(nameof(ExpectedObjectCases))]
         [Test]
-        public void Calculate_And_Return_Value_For_The_First_Call_Get_Method(object expectedObject)
+        public void Should_Calculate_And_Return_Value_For_The_First_Call_Get_Method(object expectedObject)
         {
             lazy = initializer(() => objectFactoryMock.Object.GetNewObject());
             objectFactoryMock.Setup(factory => factory.GetNewObject()).Returns(expectedObject);
@@ -70,7 +70,7 @@ namespace LazyInitializationTests
 
         [TestCaseSource(nameof(ExpectedObjectCases))]
         [Test]
-        public void Returns_The_Same_Object_For_The_Second_Call_Get_Method(object expectedObject)
+        public void Should_Return_The_Same_Object_For_The_Second_Call_Get_Method(object expectedObject)
         {
             lazy = initializer(() => objectFactoryMock.Object.GetNewObject());
             objectFactoryMock.Setup(factory => factory.GetNewObject()).Returns(expectedObject);
@@ -84,7 +84,7 @@ namespace LazyInitializationTests
         }
 
         [Test]
-        public void Throw_InvalidOperationException_When_The_Initialization_Function_Tries_To_Call_Method_Get_Of_This_Instance()
+        public void Should_Throw_InvalidOperationException_When_The_Initialization_Function_Tries_To_Call_Method_Get_Of_This_Instance()
         {
             const string exceptionMessage = "Recursive calls Get().";
             lazy = initializer(() => new object());
