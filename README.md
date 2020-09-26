@@ -7,6 +7,7 @@ Here's homework from programming lessons. (sem 3)
 [SPBU homework](https://github.com/MihailKulikov/MyHomeworksSem3) |
 ----------- |
 [Homework №1](https://github.com/MihailKulikov/MyHomeworksSem3#homework-1) |
+[Homework №2](https://github.com/MihailKulikov/MyHomeworksSem3#homework-2) |
 
 ## Homework №1 
 [Решение](https://github.com/MihailKulikov/MyHomeworksSem3/tree/main/sem3/hw1.1)
