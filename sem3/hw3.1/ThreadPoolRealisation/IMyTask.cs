@@ -8,6 +8,5 @@ namespace ThreadPoolRealisation
         bool IsCompleted { get; }
         TResult Result { get; }
         TNewResult ContinueWith<TNewResult>(Func<TResult, TNewResult> func);
-        Task<>
     }
 }
