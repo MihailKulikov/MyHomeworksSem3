@@ -13,6 +13,11 @@ namespace ThreadPoolRealisation
 
         public MyThreadPool(int threadsCount)
         {
+            if (threadsCount <= 0)
+            {
+                throw new ArgumentException("Threads' count is not positive.");
+            }
+            
             threads = new List<Thread>();
             for (var i = 0; i < threads.Count; i++)
             {
