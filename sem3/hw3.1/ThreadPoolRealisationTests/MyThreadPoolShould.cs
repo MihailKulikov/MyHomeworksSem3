@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using ThreadPoolRealisation;
+using Moq;
 
 namespace ThreadPoolRealisationTests
 {
@@ -20,6 +21,13 @@ namespace ThreadPoolRealisationTests
             const string exceptionMessage = "Threads' count is not positive.";
             Assert.That(() => new MyThreadPool(threadsCount),
                 Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
+        }
+
+        [Test]
+        public void Throw_ArgumentNullException_When_Calling_Submit_With_Null_Func()
+        {
+            threadPool = new MyThreadPool(1);
+            Assert.That(() => threadPool.Submit<It.IsAnyType>(null), Throws.ArgumentNullException);
         }
     }
 }
