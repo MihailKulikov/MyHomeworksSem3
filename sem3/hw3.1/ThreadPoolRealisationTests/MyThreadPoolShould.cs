@@ -115,6 +115,18 @@ namespace ThreadPoolRealisationTests
             }
         }
 
+        [Test]
+        public void Work_Correctly_With_ContinueWith_Calling()
+        {
+            threadPool = new MyThreadPool(3);
+
+            var firstTask = threadPool.Submit(() => 2 * 2);
+            var secondTask = firstTask.ContinueWith(x => x.ToString());
+            
+            Assert.That(firstTask.Result, Is.EqualTo(4));
+            Assert.That(secondTask.Result, Is.EqualTo("4"));
+        }
+
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {

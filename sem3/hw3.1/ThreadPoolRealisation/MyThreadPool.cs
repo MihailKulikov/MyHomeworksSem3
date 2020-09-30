@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace ThreadPoolRealisation
@@ -13,23 +14,32 @@ namespace ThreadPoolRealisation
             private TResult result;
             private readonly object isCompletedLock = new object();
             private AggregateException aggregateException;
-            private ConcurrentQueue<Action> continueWithTasksQueue = new ConcurrentQueue<Action>();
-            private ConcurrentQueue<Action> threadPoolQueue;
+            private readonly Queue<Action> taskSubmitQueue = new Queue<Action>();
+            private readonly MyThreadPool threadPool;
+            private volatile bool isCompleted = false;
 
-            public MyTask(Func<TResult> func, ConcurrentQueue<Action> threadPoolQueue)
+            public MyTask(Func<TResult> func, MyThreadPool threadPool)
             {
-                this.threadPoolQueue = threadPoolQueue;
+                this.threadPool = threadPool;
                 this.func = func;
             }
-            
-            public bool IsCompleted { get; private set; }
 
+            public bool IsCompleted
+            {
+                get => isCompleted;
+                private set => isCompleted = value;
+            }
+            
             public TResult Result
             {
                 get
                 {
                     if (IsCompleted)
                     {
+                        if (aggregateException != null)
+                        {
+                            throw aggregateException;
+                        }
                         return result;
                     }
 
@@ -37,6 +47,10 @@ namespace ThreadPoolRealisation
                     {
                         if (IsCompleted)
                         {
+                            if (aggregateException != null)
+                            {
+                                throw aggregateException;
+                            }
                             return result;
                         }
 
@@ -45,16 +59,40 @@ namespace ThreadPoolRealisation
                         {
                             throw aggregateException;
                         }
-                        
                         return result;
                     }
                 }
                 private set => result = value;
             }
 
-            public TNewResult ContinueWith<TNewResult>(Func<TResult, TNewResult> func)
+            public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> continueWithFunc)
             {
-                throw new NotImplementedException();
+                if (continueWithFunc == null)
+                {
+                    throw new ArgumentNullException(nameof(continueWithFunc));
+                }
+                
+                var task = new MyTask<TNewResult>(() => continueWithFunc(Result), threadPool);
+                if (IsCompleted)
+                {
+                    threadPool.Submit(task);
+                }
+                else
+                {
+                    lock (taskSubmitQueue)
+                    {
+                        if (IsCompleted)
+                        {
+                            threadPool.Submit(task);
+                        }
+                        else
+                        {
+                            taskSubmitQueue.Enqueue(() => threadPool.Submit(task));
+                        }
+                    }
+                }
+
+                return task;
             }
 
             public void Run()
@@ -69,7 +107,16 @@ namespace ThreadPoolRealisation
                 }
                 finally
                 {
-                    IsCompleted = true;
+                    lock (taskSubmitQueue)
+                    {
+                        foreach (var action in taskSubmitQueue)
+                        {
+                            action();
+                        }
+                        
+                        IsCompleted = true;
+                    }
+                    
                     semaphore.Release();
                 }
             }
@@ -106,11 +153,17 @@ namespace ThreadPoolRealisation
                 throw new ArgumentNullException(nameof(func));
             }
             
-            var task = new MyTask<TResult>(func, tasksQueue);
-            tasksQueue.Enqueue(() => task.Run());
+            var task = new MyTask<TResult>(func, this);
+            tasksQueue.Enqueue(task.Run);
             semaphore.Release();
 
             return task;
+        }
+
+        private void Submit<TResult>(MyTask<TResult> task)
+        {
+            tasksQueue.Enqueue(task.Run);
+            semaphore.Release();
         }
         
         private void ExecuteTasks(CancellationToken cancellationToken)
