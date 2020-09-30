@@ -33,7 +33,7 @@ namespace ThreadPoolRealisationTests
         [Test]
         public void Throw_ArgumentNullException_When_Calling_Submit_With_Null_Func()
         {
-            threadPool = new MyThreadPool(1);
+            threadPool = new MyThreadPool(2);
             
             Assert.That(() => threadPool.Submit<It.IsAnyType>(null), Throws.ArgumentNullException);
         }
@@ -41,7 +41,7 @@ namespace ThreadPoolRealisationTests
         [Test]
         public void Return_Result_Of_Calculation_When_Getting_Result_Property_Of_Submitted_Task()
         {
-            threadPool = new MyThreadPool(1);
+            threadPool = new MyThreadPool(2);
 
             var task = threadPool.Submit(() => 4 * 4);
             var actualResult = task.Result;
@@ -53,7 +53,7 @@ namespace ThreadPoolRealisationTests
         [Test]
         public void Return_Result_Of_Calculation_When_Getting_Result_Property_Of_Submitted_Task_Twice()
         {
-            threadPool = new MyThreadPool(1);
+            threadPool = new MyThreadPool(2);
 
             var task = threadPool.Submit(() =>
             {
@@ -99,19 +99,19 @@ namespace ThreadPoolRealisationTests
         public void Throw_AggregateException_When_Getting_Result_Property_Of_The_Task_With_Func_That_Throws_Exception()
         {
             const string exceptionMessage = "Exception";
-            threadPool = new MyThreadPool(1);
+            threadPool = new MyThreadPool(2);
             var exception = new Exception(exceptionMessage);
             
+            var task = threadPool.Submit<int>(() => throw exception);
             try
             {
-                var task = threadPool.Submit<int>(() => throw exception);
                 var actualResult = task.Result;
             }
-            catch (AggregateException e)
+            catch (Exception e)
             {
                 Assert.That(e, Is.TypeOf<AggregateException>());
-                Assert.That(e.InnerExceptions.Count, Is.EqualTo(1));
-                Assert.That(e.InnerException, Is.EqualTo(exception));
+                Assert.That(((AggregateException)e).InnerExceptions.Count, Is.EqualTo(1));
+                Assert.That(((AggregateException)e).InnerException, Is.EqualTo(exception));
             }
         }
 
@@ -130,11 +130,33 @@ namespace ThreadPoolRealisationTests
         [Test]
         public void Throw_ArgumentNullException_When_Calling_ContinueWith_With_Null()
         {
-            threadPool = new MyThreadPool(1);
+            threadPool = new MyThreadPool(2);
 
             var task = threadPool.Submit(() => 2 + 2);
             
             Assert.That(() => task.ContinueWith<int>(null), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        public void Throw_AggregateException_When_Calling_ContinueWith_Of_Task_That_Throws_Exception()
+        {
+            const string exceptionMessage = "Exception";
+            threadPool = new MyThreadPool(2);
+            var exception = new Exception(exceptionMessage);
+
+
+            var task = threadPool.Submit<int>(() => throw exception).ContinueWith(x => x.ToString());
+            try
+            {
+                var result = task.Result;
+            }
+            catch (Exception e)
+            {
+                var actualException = ((AggregateException)((AggregateException) e).InnerException)?.InnerException;
+                Assert.That(e, Is.TypeOf<AggregateException>());
+                Assert.That(((AggregateException) e).InnerExceptions.Count, Is.EqualTo(1));
+                Assert.That(actualException, Is.EqualTo(exception));
+            }
         }
 
         [OneTimeTearDown]
