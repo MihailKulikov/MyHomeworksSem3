@@ -12,9 +12,13 @@ namespace ThreadPoolRealisation
             private readonly Semaphore semaphore = new Semaphore(0, 1);
             private TResult result;
             private readonly object isCompletedLock = new object();
+            private AggregateException aggregateException;
+            private ConcurrentQueue<Action> continueWithTasksQueue = new ConcurrentQueue<Action>();
+            private ConcurrentQueue<Action> threadPoolQueue;
 
-            public MyTask(Func<TResult> func)
+            public MyTask(Func<TResult> func, ConcurrentQueue<Action> threadPoolQueue)
             {
+                this.threadPoolQueue = threadPoolQueue;
                 this.func = func;
             }
             
@@ -37,6 +41,11 @@ namespace ThreadPoolRealisation
                         }
 
                         semaphore.WaitOne();
+                        if (aggregateException != null)
+                        {
+                            throw aggregateException;
+                        }
+                        
                         return result;
                     }
                 }
@@ -50,14 +59,30 @@ namespace ThreadPoolRealisation
 
             public void Run()
             {
-                Result = func();
-                IsCompleted = true;
-                semaphore.Release();
+                try
+                {
+                    Result = func();
+                }
+                catch (Exception e)
+                {
+                    aggregateException = new AggregateException(e);
+                }
+                finally
+                {
+                    IsCompleted = true;
+                    semaphore.Release();
+                }
+            }
+
+            ~MyTask()
+            {
+                semaphore.Dispose();
             }
         }
 
         private readonly ConcurrentQueue<Action> tasksQueue = new ConcurrentQueue<Action>();
         private readonly Semaphore semaphore = new Semaphore(0, int.MaxValue);
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         public MyThreadPool(int threadsCount)
         {
@@ -69,7 +94,7 @@ namespace ThreadPoolRealisation
             var threads = new Thread[threadsCount];
             for (var i = 0; i < threads.Length; i++)
             {
-                threads[i] = new Thread(ExecuteTasks);
+                threads[i] = new Thread(() => ExecuteTasks(cancellationTokenSource.Token));
                 threads[i].Start();
             }
         }
@@ -81,14 +106,14 @@ namespace ThreadPoolRealisation
                 throw new ArgumentNullException(nameof(func));
             }
             
-            var task = new MyTask<TResult>(func);
+            var task = new MyTask<TResult>(func, tasksQueue);
             tasksQueue.Enqueue(() => task.Run());
             semaphore.Release();
 
             return task;
         }
         
-        private void ExecuteTasks()
+        private void ExecuteTasks(CancellationToken cancellationToken)
         {
             while (true)
             {
