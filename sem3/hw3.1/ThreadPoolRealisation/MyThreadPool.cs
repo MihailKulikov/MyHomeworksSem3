@@ -29,7 +29,7 @@ namespace ThreadPoolRealisation
                 get => isCompleted;
                 private set => isCompleted = value;
             }
-            
+
             public TResult Result
             {
                 get
@@ -40,6 +40,7 @@ namespace ThreadPoolRealisation
                         {
                             throw aggregateException;
                         }
+
                         return result;
                     }
 
@@ -51,6 +52,7 @@ namespace ThreadPoolRealisation
                             {
                                 throw aggregateException;
                             }
+
                             return result;
                         }
 
@@ -59,6 +61,7 @@ namespace ThreadPoolRealisation
                         {
                             throw aggregateException;
                         }
+
                         return result;
                     }
                 }
@@ -71,7 +74,7 @@ namespace ThreadPoolRealisation
                 {
                     throw new ArgumentNullException(nameof(continueWithFunc));
                 }
-                
+
                 var task = new MyTask<TNewResult>(() => continueWithFunc(Result), threadPool);
                 if (IsCompleted)
                 {
@@ -113,10 +116,10 @@ namespace ThreadPoolRealisation
                         {
                             action();
                         }
-                        
+
                         IsCompleted = true;
                     }
-                    
+
                     semaphore.Release();
                 }
             }
@@ -137,7 +140,7 @@ namespace ThreadPoolRealisation
             {
                 throw new ArgumentException("Threads' count is not positive.");
             }
-            
+
             var threads = new Thread[threadsCount];
             for (var i = 0; i < threads.Length; i++)
             {
@@ -157,7 +160,7 @@ namespace ThreadPoolRealisation
             {
                 throw new MyThreadPoolShutdownedException("Thread pool shutdowned.");
             }
-            
+
             var task = new MyTask<TResult>(func, this);
             tasksQueue.Enqueue(task.Run);
             semaphore.Release();
@@ -167,6 +170,7 @@ namespace ThreadPoolRealisation
 
         public void Shutdown()
         {
+            if (cancellationTokenSource.IsCancellationRequested) return;
             cancellationTokenSource.Cancel();
         }
 
@@ -175,7 +179,7 @@ namespace ThreadPoolRealisation
             tasksQueue.Enqueue(task.Run);
             semaphore.Release();
         }
-        
+
         private void ExecuteTasks(CancellationToken cancellationToken)
         {
             while (true)
@@ -184,7 +188,7 @@ namespace ThreadPoolRealisation
                 {
                     break;
                 }
-                
+
                 semaphore.WaitOne();
 
                 if (tasksQueue.TryDequeue(out var taskRunAction))
