@@ -182,6 +182,7 @@ namespace ThreadPoolRealisation
 
         private void ExecuteTasks(CancellationToken cancellationToken)
         {
+            //TODO: correct work after shutdown
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested && tasksQueue.IsEmpty)
