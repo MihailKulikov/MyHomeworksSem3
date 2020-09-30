@@ -127,6 +127,16 @@ namespace ThreadPoolRealisationTests
             Assert.That(secondTask.Result, Is.EqualTo("4"));
         }
 
+        [Test]
+        public void Throw_ArgumentNullException_When_Calling_ContinueWith_With_Null()
+        {
+            threadPool = new MyThreadPool(1);
+
+            var task = threadPool.Submit(() => 2 + 2);
+            
+            Assert.That(() => task.ContinueWith<int>(null), Throws.ArgumentNullException);
+        }
+
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {

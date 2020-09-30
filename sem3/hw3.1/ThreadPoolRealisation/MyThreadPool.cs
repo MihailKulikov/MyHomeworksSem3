@@ -16,7 +16,7 @@ namespace ThreadPoolRealisation
             private AggregateException aggregateException;
             private readonly Queue<Action> taskSubmitQueue = new Queue<Action>();
             private readonly MyThreadPool threadPool;
-            private volatile bool isCompleted = false;
+            private volatile bool isCompleted;
 
             public MyTask(Func<TResult> func, MyThreadPool threadPool)
             {
