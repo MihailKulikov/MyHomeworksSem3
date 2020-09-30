@@ -10,12 +10,10 @@ namespace ThreadPoolRealisationTests
     {
         private MyThreadPool threadPool;
         private volatile int callsCount;
-        private CountdownEvent countdownEvent;
 
         [SetUp]
         public void Setup()
-        {   
-            countdownEvent = new CountdownEvent(1);
+        {
             callsCount = 0;
         }
 
@@ -159,10 +157,21 @@ namespace ThreadPoolRealisationTests
             }
         }
 
+        [Test]
+        public void Throw_MyThreadPoolShutdownedException_When_Trying_To_Submit_To_Shutdowned_MyThreadPool()
+        {
+            const string exceptionMessage = "Thread pool shutdowned.";
+            threadPool = new MyThreadPool(2);
+            threadPool.Shutdown();
+
+            Assert.That(() => threadPool.Submit(() => 2 * 2),
+                Throws.Exception.TypeOf<MyThreadPoolShutdownedException>().And.Message.EqualTo(exceptionMessage));
+        }
+        
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            countdownEvent.Dispose();
+            
         }
     }
 }

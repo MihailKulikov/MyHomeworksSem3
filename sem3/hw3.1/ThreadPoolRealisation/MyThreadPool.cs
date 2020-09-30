@@ -152,12 +152,22 @@ namespace ThreadPoolRealisation
             {
                 throw new ArgumentNullException(nameof(func));
             }
+
+            if (cancellationTokenSource.IsCancellationRequested)
+            {
+                throw new MyThreadPoolShutdownedException("Thread pool shutdowned.");
+            }
             
             var task = new MyTask<TResult>(func, this);
             tasksQueue.Enqueue(task.Run);
             semaphore.Release();
 
             return task;
+        }
+
+        public void Shutdown()
+        {
+            cancellationTokenSource.Cancel();
         }
 
         private void Submit<TResult>(MyTask<TResult> task)
@@ -170,6 +180,11 @@ namespace ThreadPoolRealisation
         {
             while (true)
             {
+                if (cancellationToken.IsCancellationRequested && tasksQueue.IsEmpty)
+                {
+                    break;
+                }
+                
                 semaphore.WaitOne();
 
                 if (tasksQueue.TryDequeue(out var taskRunAction))
