@@ -36,33 +36,18 @@ namespace ThreadPoolRealisation
                 {
                     if (IsCompleted)
                     {
-                        if (aggregateException != null)
-                        {
-                            throw aggregateException;
-                        }
-
-                        return result;
+                        return GetResultOrThrowException();
                     }
 
                     lock (isCompletedLock)
                     {
                         if (IsCompleted)
                         {
-                            if (aggregateException != null)
-                            {
-                                throw aggregateException;
-                            }
-
-                            return result;
+                            GetResultOrThrowException();
                         }
 
                         semaphore.WaitOne();
-                        if (aggregateException != null)
-                        {
-                            throw aggregateException;
-                        }
-
-                        return result;
+                        return GetResultOrThrowException();
                     }
                 }
                 private set => result = value;
@@ -112,9 +97,9 @@ namespace ThreadPoolRealisation
                 {
                     lock (taskSubmitQueue)
                     {
-                        foreach (var action in taskSubmitQueue)
+                        foreach (var taskSubmitAction in taskSubmitQueue)
                         {
-                            action();
+                            taskSubmitAction();
                         }
 
                         IsCompleted = true;
@@ -122,6 +107,16 @@ namespace ThreadPoolRealisation
 
                     semaphore.Release();
                 }
+            }
+
+            private TResult GetResultOrThrowException()
+            {
+                if (aggregateException != null)
+                {
+                    throw aggregateException;
+                }
+
+                return result;
             }
 
             ~MyTask()
