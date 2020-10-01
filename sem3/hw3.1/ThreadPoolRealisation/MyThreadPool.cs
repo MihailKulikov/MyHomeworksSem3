@@ -9,10 +9,9 @@ namespace ThreadPoolRealisation
     {
         private class MyTask<TResult> : IMyTask<TResult>
         {
-            private readonly Func<TResult> func;
-            private readonly Semaphore semaphore = new Semaphore(0, 1);
+            private Func<TResult> func;
+            private readonly ManualResetEvent manualResetEvent = new ManualResetEvent(false);
             private TResult result;
-            private readonly object isCompletedLock = new object();
             private AggregateException aggregateException;
             private readonly Queue<Action> taskSubmitQueue = new Queue<Action>();
             private readonly MyThreadPool threadPool;
@@ -34,21 +33,8 @@ namespace ThreadPoolRealisation
             {
                 get
                 {
-                    if (IsCompleted)
-                    {
-                        return GetResultOrThrowException();
-                    }
-
-                    lock (isCompletedLock)
-                    {
-                        if (IsCompleted)
-                        {
-                            GetResultOrThrowException();
-                        }
-
-                        semaphore.WaitOne();
-                        return GetResultOrThrowException();
-                    }
+                    manualResetEvent.WaitOne();
+                    return GetResultOrThrowException();
                 }
                 private set => result = value;
             }
@@ -97,15 +83,16 @@ namespace ThreadPoolRealisation
                 {
                     lock (taskSubmitQueue)
                     {
-                        foreach (var taskSubmitAction in taskSubmitQueue)
+                        for(var i = 0; i < taskSubmitQueue.Count; i++)
                         {
-                            taskSubmitAction();
+                            taskSubmitQueue.Dequeue().Invoke();
                         }
-
+                        
                         IsCompleted = true;
                     }
-
-                    semaphore.Release();
+                    
+                    manualResetEvent.Set();
+                    func = null;
                 }
             }
 
@@ -121,13 +108,14 @@ namespace ThreadPoolRealisation
 
             ~MyTask()
             {
-                semaphore.Dispose();
+                manualResetEvent.Dispose();
             }
         }
 
         private readonly ConcurrentQueue<Action> tasksQueue = new ConcurrentQueue<Action>();
         private readonly Semaphore semaphore = new Semaphore(0, int.MaxValue);
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private readonly CountdownEvent countdownEvent;
 
         public MyThreadPool(int threadsCount)
         {
@@ -137,6 +125,7 @@ namespace ThreadPoolRealisation
             }
 
             var threads = new Thread[threadsCount];
+            countdownEvent = new CountdownEvent(threads.Length);
             for (var i = 0; i < threads.Length; i++)
             {
                 threads[i] = new Thread(() => ExecuteTasks(cancellationTokenSource.Token));
@@ -163,33 +152,53 @@ namespace ThreadPoolRealisation
             return task;
         }
 
-        public void Shutdown()
-        {
-            if (cancellationTokenSource.IsCancellationRequested) return;
-            cancellationTokenSource.Cancel();
-        }
-
         private void Submit<TResult>(MyTask<TResult> task)
         {
             tasksQueue.Enqueue(task.Run);
             semaphore.Release();
         }
 
+        public void Shutdown()
+        {
+            if (cancellationTokenSource.IsCancellationRequested) return;
+            cancellationTokenSource.Cancel();
+            countdownEvent.Wait();
+        }
+
         private void ExecuteTasks(CancellationToken cancellationToken)
         {
-            //TODO: correct work after shutdown
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested && tasksQueue.IsEmpty)
                 {
+                    countdownEvent.Signal();
                     break;
                 }
 
-                semaphore.WaitOne();
-
-                if (tasksQueue.TryDequeue(out var taskRunAction))
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    taskRunAction();
+                    Action taskRunAction;
+                    lock (tasksQueue)
+                    {
+                        if (tasksQueue.IsEmpty)
+                        {
+                            countdownEvent.Signal();
+                            break;
+                        }
+
+                        tasksQueue.TryDequeue(out taskRunAction);
+                    }
+
+                    taskRunAction?.Invoke();
+                }
+                else
+                {
+                    if (tasksQueue.TryDequeue(out var taskRunAction))
+                    {
+                        taskRunAction();
+                    }
+                    
+                    semaphore.WaitOne();
                 }
             }
         }

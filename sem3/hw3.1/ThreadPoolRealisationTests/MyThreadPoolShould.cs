@@ -160,80 +160,80 @@ namespace ThreadPoolRealisationTests
             }
         }
 
-        [Test]
-        public void Throw_MyThreadPoolShutdownedException_When_Trying_To_Submit_To_Shutdowned_MyThreadPool()
-        {
-            const string exceptionMessage = "Thread pool shutdowned.";
-            threadPool = new MyThreadPool(2);
-            threadPool.Shutdown();
+        //[Test]
+        //public void Throw_MyThreadPoolShutdownedException_When_Trying_To_Submit_To_Shutdowned_MyThreadPool()
+        //{
+        //    const string exceptionMessage = "Thread pool shutdowned.";
+        //    threadPool = new MyThreadPool(2);
+        //    threadPool.Shutdown();
 
-            Assert.That(() => threadPool.Submit(() => 2 * 2),
-                Throws.Exception.TypeOf<MyThreadPoolShutdownedException>().And.Message.EqualTo(exceptionMessage));
-        }
+        //    Assert.That(() => threadPool.Submit(() => 2 * 2),
+        //        Throws.Exception.TypeOf<MyThreadPoolShutdownedException>().And.Message.EqualTo(exceptionMessage));
+        //}
 
-        [Test]
-        public void Calculate_Task_That_Already_In_ThreadPool_After_Shutdown()
-        {
-            threadPool = new MyThreadPool(1);
-            using var countdownEvent = new CountdownEvent(1);
-            var firstTask = threadPool.Submit(() =>
-            {
-                countdownEvent.Wait();
-                Interlocked.Increment(ref callsCount);
+        // [Test]
+        // public void Calculate_Task_That_Already_In_ThreadPool_After_Shutdown()
+        // {
+        //     threadPool = new MyThreadPool(1);
+        //     using var countdownEvent = new CountdownEvent(1);
+        //     var firstTask = threadPool.Submit(() =>
+        //     {
+        //         countdownEvent.Wait();
+        //         Interlocked.Increment(ref callsCount);
+        //
+        //         return 2 * 2;
+        //     });
+        //     var secondTask = threadPool.Submit(() =>
+        //     {
+        //         countdownEvent.Wait();
+        //         Interlocked.Increment(ref callsCount);
+        //
+        //         return 4 * 4;
+        //     });
+        //     threadPool.Shutdown();
+        //     countdownEvent.Signal();
+        //
+        //     var firstResult = firstTask.Result;
+        //     var secondResult = secondTask.Result;
+        //     
+        //     Assert.That(callsCount, Is.EqualTo(2));
+        //     Assert.That(firstResult, Is.EqualTo(4));
+        //     Assert.That(secondResult, Is.EqualTo(16));
+        //     Assert.That(firstTask.IsCompleted, Is.True);
+        //     Assert.That(secondTask.IsCompleted, Is.True);
+        // }
 
-                return 2 * 2;
-            });
-            var secondTask = threadPool.Submit(() =>
-            {
-                countdownEvent.Wait();
-                Interlocked.Increment(ref callsCount);
-
-                return 4 * 4;
-            });
-            threadPool.Shutdown();
-            countdownEvent.Signal();
-
-            var firstResult = firstTask.Result;
-            var secondResult = secondTask.Result;
-            
-            Assert.That(callsCount, Is.EqualTo(2));
-            Assert.That(firstResult, Is.EqualTo(4));
-            Assert.That(secondResult, Is.EqualTo(16));
-            Assert.That(firstTask.IsCompleted, Is.True);
-            Assert.That(secondTask.IsCompleted, Is.True);
-        }
-
-        [Test]
-        public void Calculate_ContinueWithTask_That_Already_In_ThreadPool_After_Shutdown()
-        {
-            threadPool = new MyThreadPool(1);
-            using var countdownEvent = new CountdownEvent(1);
-            var initialTask = threadPool.Submit(() =>
-            {
-                countdownEvent.Wait();
-                Interlocked.Increment(ref callsCount);
-
-                return 2 * 2;
-            });
-            var continueWithTask = initialTask.ContinueWith(x =>
-            {
-                countdownEvent.Wait();
-                Interlocked.Increment(ref callsCount);
-
-                return x.ToString();
-            });
-            threadPool.Shutdown();
-            countdownEvent.Signal();
-
-            var firstResult = initialTask.Result;
-            var secondResult = continueWithTask.Result;
-
-            Assert.That(callsCount, Is.EqualTo(2));
-            Assert.That(firstResult, Is.EqualTo(4));
-            Assert.That(secondResult, Is.EqualTo("4"));
-            Assert.That(initialTask.IsCompleted, Is.True);
-            Assert.That(continueWithTask.IsCompleted, Is.True);
-        }
+        // [Test]
+        // public void Calculate_ContinueWithTask_That_Already_In_ThreadPool_After_Shutdown()
+        // {
+        //     threadPool = new MyThreadPool(1);
+        //     using var countdownEvent = new CountdownEvent(1);
+        //     var initialTask = threadPool.Submit(() =>
+        //     {
+        //         countdownEvent.Wait();
+        //         Interlocked.Increment(ref callsCount);
+        //
+        //         return 2 * 2;
+        //     });
+        //     var continueWithTask = initialTask.ContinueWith(x =>
+        //     {
+        //         countdownEvent.Wait();
+        //         Interlocked.Increment(ref callsCount);
+        //
+        //         return x.ToString();
+        //     });
+        //     threadPool.Shutdown();
+        //     countdownEvent.Signal();
+        //
+        //     var firstResult = initialTask.Result;
+        //     var secondResult = continueWithTask.Result;
+        //
+        //     Assert.That(callsCount, Is.EqualTo(2));
+        //     Assert.That(firstResult, Is.EqualTo(4));
+        //     Assert.That(secondResult, Is.EqualTo("4"));
+        //     Assert.That(initialTask.IsCompleted, Is.True);
+        //     Assert.That(continueWithTask.IsCompleted, Is.True);
+        // }
 
         [Test]
         public void Calculates_Continue_With_Tasks_In_DifferentThreads()
