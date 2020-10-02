@@ -82,7 +82,8 @@ namespace ThreadPoolRealisation
                 {
                     lock (taskSubmitQueue)
                     {
-                        for (var i = 0; i < taskSubmitQueue.Count; i++)
+                        var taskSubmitCount = taskSubmitQueue.Count;
+                        for (var i = 0; i < taskSubmitCount; i++)
                         {
                             taskSubmitQueue.Dequeue().Invoke();
                         }

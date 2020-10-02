@@ -28,7 +28,7 @@ namespace ThreadPoolRealisationTests
             var initialTask = threadPool.Submit(() =>
             {
                 countdownEvent.Wait();
-
+                Thread.Sleep(10);
                 return 2 * 2;
             });
             for (var i = 0; i < threads.Length; i++)
@@ -48,6 +48,7 @@ namespace ThreadPoolRealisationTests
                 thread.Join();
             }
 
+            Assert.That(initialTask.Result, Is.EqualTo(4));
             foreach (var task in tasks)
             {
                 Assert.That(task.Result, Is.EqualTo("42"));

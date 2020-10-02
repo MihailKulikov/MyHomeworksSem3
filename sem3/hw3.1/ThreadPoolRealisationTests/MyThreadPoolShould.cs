@@ -112,6 +112,8 @@ namespace ThreadPoolRealisationTests
                 Assert.That(((AggregateException)e).InnerExceptions.Count, Is.EqualTo(1));
                 Assert.That(((AggregateException)e).InnerException, Is.EqualTo(exception));
             }
+
+            Assert.That(() => task.Result, Throws.Exception.TypeOf<AggregateException>());
         }
 
         [Test]
