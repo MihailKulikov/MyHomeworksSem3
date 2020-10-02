@@ -149,9 +149,9 @@ namespace ThreadPoolRealisationTests
         [Test]
         public void Submit_Should_Be_ThreadSafe()
         {
-            const int threadCount = 10;
+            const int threadCount = 100;
             var threads = new Thread[threadCount];
-            var tasks = new ConcurrentBag<IMyTask<int>>();
+            var tasks = new ConcurrentBag<int>();
             threadPool = new MyThreadPool(Environment.ProcessorCount);
             using var countdownEvent = new CountdownEvent(1);
 
@@ -166,7 +166,7 @@ namespace ThreadPoolRealisationTests
                         Thread.Sleep(10);
 
                         return 2 * 2;
-                    }));
+                    }).Result);
                 });
                 threads[i].Start();
             }
@@ -179,7 +179,7 @@ namespace ThreadPoolRealisationTests
 
             foreach (var task in tasks)
             {
-                Assert.That(task.Result, Is.EqualTo(4));
+                Assert.That(task, Is.EqualTo(4));
             }
 
             Assert.That(callsCount, Is.EqualTo(threadCount));

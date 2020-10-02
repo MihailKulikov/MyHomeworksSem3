@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -12,7 +13,7 @@ namespace ThreadPoolRealisation
             private readonly ManualResetEvent manualResetEvent = new ManualResetEvent(false);
             private TResult result;
             private AggregateException aggregateException;
-            private readonly Queue<Action> taskSubmitQueue = new Queue<Action>();
+            private readonly Queue<Action> queueOfContinueWithTasks = new Queue<Action>();
             private readonly MyThreadPool threadPool;
             private volatile bool isCompleted;
 
@@ -52,7 +53,7 @@ namespace ThreadPoolRealisation
                 }
                 else
                 {
-                    lock (taskSubmitQueue)
+                    lock (queueOfContinueWithTasks)
                     {
                         if (IsCompleted)
                         {
@@ -60,11 +61,11 @@ namespace ThreadPoolRealisation
                         }
                         else
                         {
-                            taskSubmitQueue.Enqueue(() => threadPool.Submit(task));
+                            queueOfContinueWithTasks.Enqueue(() => threadPool.Submit(task));
                         }
                     }
                 }
-
+                
                 return task;
             }
 
@@ -80,12 +81,12 @@ namespace ThreadPoolRealisation
                 }
                 finally
                 {
-                    lock (taskSubmitQueue)
+                    lock (queueOfContinueWithTasks)
                     {
-                        var taskSubmitCount = taskSubmitQueue.Count;
+                        var taskSubmitCount = queueOfContinueWithTasks.Count;
                         for (var i = 0; i < taskSubmitCount; i++)
                         {
-                            taskSubmitQueue.Dequeue().Invoke();
+                            queueOfContinueWithTasks.Dequeue().Invoke();
                         }
 
                         IsCompleted = true;
@@ -113,8 +114,8 @@ namespace ThreadPoolRealisation
         }
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        private readonly CountdownEvent countdownEvent;
-        private readonly SynchronizedQueue<Action> tasksQueue = new SynchronizedQueue<Action>();
+        private readonly CountdownEvent countdownEventForShutdown;
+        private readonly BlockingCollection<Action> collectionOfPendingTasks = new BlockingCollection<Action>();
 
         public MyThreadPool(int threadsCount)
         {
@@ -124,7 +125,7 @@ namespace ThreadPoolRealisation
             }
 
             var threads = new Thread[threadsCount];
-            countdownEvent = new CountdownEvent(threads.Length);
+            countdownEventForShutdown = new CountdownEvent(threads.Length);
             for (var i = 0; i < threads.Length; i++)
             {
                 threads[i] = new Thread(() => ExecuteTasks(cancellationTokenSource.Token));
@@ -141,63 +142,62 @@ namespace ThreadPoolRealisation
 
             if (cancellationTokenSource.IsCancellationRequested)
             {
-                throw new MyThreadPoolShutdownedException("Thread pool shutdowned.");
+                throw new InvalidOperationException("Thread pool shutdowned.");
             }
 
             var task = new MyTask<TResult>(func, this);
-            tasksQueue.Enqueue(task.Run);
+            collectionOfPendingTasks.Add(task.Run);
 
             return task;
         }
 
         private void Submit<TResult>(MyTask<TResult> task)
         {
-            tasksQueue.Enqueue(task.Run);
+            try
+            {
+                collectionOfPendingTasks.Add(task.Run);
+            }
+            catch(InvalidOperationException)
+            {
+                throw new InvalidOperationException("Thread pool shutdowned.");
+            }
         }
 
         public void Shutdown()
         {
             if (cancellationTokenSource.IsCancellationRequested) return;
             cancellationTokenSource.Cancel();
-            countdownEvent.Wait();
+            countdownEventForShutdown.Wait();
         }
 
         private void ExecuteTasks(CancellationToken cancellationToken)
         {
             while (true)
             {
-                tasksQueue.Dequeue().Invoke();
-                // if (cancellationToken.IsCancellationRequested && tasksQueue.IsEmpty)
-                // {
-                //     countdownEvent.Signal();
-                //     break;
-                // }
-                //
-                // if (cancellationToken.IsCancellationRequested)
-                // {
-                //     Action taskRunAction;
-                //     lock (tasksQueue)
-                //     {
-                //         if (tasksQueue.IsEmpty)
-                //         {
-                //             countdownEvent.Signal();
-                //             break;
-                //         }
-                //
-                //         tasksQueue.TryDequeue(out taskRunAction);
-                //     }
-                //
-                //     taskRunAction?.Invoke();
-                // }
-                // else
-                // {
-                //     if (tasksQueue.TryDequeue(out var taskRunAction))
-                //     {
-                //         taskRunAction();
-                //     }
-                //     
-                //     semaphore.WaitOne();
-                // }
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    if (collectionOfPendingTasks.TryTake(out var taskRunAction))
+                    {
+                        taskRunAction.Invoke();
+                    }
+                    else
+                    {
+                        countdownEventForShutdown.Signal();
+                        break;
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        var taskRunAction = collectionOfPendingTasks.Take(cancellationToken);
+
+                        taskRunAction.Invoke();
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                }
             }
         }
     }
