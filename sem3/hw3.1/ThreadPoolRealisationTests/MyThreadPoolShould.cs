@@ -74,8 +74,8 @@ namespace ThreadPoolRealisationTests
             const int tasksCount = threadsCount + 1;
             threadPool = new MyThreadPool(threadsCount);
             var tasks = new IMyTask<int>[tasksCount];
-            using var firstCountDownEvent = new CountdownEvent(threadsCount);
-            using var secondCountDownEvent = new CountdownEvent(1);
+            using var countDownEventForTestThread = new CountdownEvent(threadsCount);
+            using var countDownEventForTasks = new CountdownEvent(1);
             
             for (var i = 0; i < tasks.Length; i++)
             {
@@ -83,15 +83,17 @@ namespace ThreadPoolRealisationTests
                 {
                     Interlocked.Increment(ref callsCount);
         
-                    firstCountDownEvent.Signal();
-                    secondCountDownEvent.Wait();
+                    countDownEventForTestThread.Signal();
+                    countDownEventForTasks.Wait();
         
                     return 2 * 2;
                 });
             }
         
-            firstCountDownEvent.Wait();
+            countDownEventForTestThread.Wait();
             Assert.That(callsCount, Is.EqualTo(threadsCount));
+
+            countDownEventForTasks.Signal();
         }
 
         [Test]
@@ -325,6 +327,12 @@ namespace ThreadPoolRealisationTests
 
             Assert.That(task.IsCompleted, Is.False);
             countdownEvent.Signal();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            threadPool?.Dispose();
         }
     }
 }

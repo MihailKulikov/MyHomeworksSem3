@@ -184,5 +184,11 @@ namespace ThreadPoolRealisationTests
 
             Assert.That(callsCount, Is.EqualTo(threadCount));
         }
+
+        [TearDown]
+        public void TearDown()
+        {
+            threadPool?.Dispose();
+        }
     }
 }
