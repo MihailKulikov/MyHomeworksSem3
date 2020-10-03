@@ -65,7 +65,7 @@ namespace ThreadPoolRealisation
                         }
                     }
                 }
-                
+
                 return task;
             }
 
@@ -153,14 +153,7 @@ namespace ThreadPoolRealisation
 
         private void Submit<TResult>(MyTask<TResult> task)
         {
-            try
-            {
-                collectionOfPendingTasks.Add(task.Run);
-            }
-            catch(InvalidOperationException)
-            {
-                throw new InvalidOperationException("Thread pool shutdowned.");
-            }
+            collectionOfPendingTasks.Add(task.Run);
         }
 
         public void Shutdown()

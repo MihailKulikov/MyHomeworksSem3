@@ -326,11 +326,5 @@ namespace ThreadPoolRealisationTests
             Assert.That(task.IsCompleted, Is.False);
             countdownEvent.Signal();
         }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-            
-        }
     }
 }
