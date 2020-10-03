@@ -23,7 +23,7 @@ namespace ThreadPoolRealisationTests
         public void Throw_ArgumentException_When_Threads_Is_Not_Positive(int threadsCount)
         {
             const string exceptionMessage = "Threads' count is not positive.";
-            
+
             Assert.That(() => new MyThreadPool(threadsCount),
                 Throws.ArgumentException.And.Message.EqualTo(exceptionMessage));
         }
@@ -32,10 +32,10 @@ namespace ThreadPoolRealisationTests
         public void Throw_ArgumentNullException_When_Calling_Submit_With_Null_Func()
         {
             threadPool = new MyThreadPool(2);
-            
+
             Assert.That(() => threadPool.Submit<It.IsAnyType>(null), Throws.ArgumentNullException);
         }
-        
+
         [Test]
         public void Return_Result_Of_Calculation_When_Getting_Result_Property_Of_Submitted_Task()
         {
@@ -43,7 +43,7 @@ namespace ThreadPoolRealisationTests
 
             var task = threadPool.Submit(() => 4 * 4);
             var actualResult = task.Result;
-            
+
             Assert.That(actualResult, Is.EqualTo(16));
             Assert.That(task.IsCompleted, Is.True);
         }
@@ -76,20 +76,20 @@ namespace ThreadPoolRealisationTests
             var tasks = new IMyTask<int>[tasksCount];
             using var countDownEventForTestThread = new CountdownEvent(threadsCount);
             using var countDownEventForTasks = new CountdownEvent(1);
-            
+
             for (var i = 0; i < tasks.Length; i++)
             {
                 tasks[i] = threadPool.Submit(() =>
                 {
                     Interlocked.Increment(ref callsCount);
-        
+
                     countDownEventForTestThread.Signal();
                     countDownEventForTasks.Wait();
-        
+
                     return 2 * 2;
                 });
             }
-        
+
             countDownEventForTestThread.Wait();
             Assert.That(callsCount, Is.EqualTo(threadsCount));
 
@@ -102,7 +102,7 @@ namespace ThreadPoolRealisationTests
             const string exceptionMessage = "Exception";
             threadPool = new MyThreadPool(2);
             var exception = new Exception(exceptionMessage);
-            
+
             var task = threadPool.Submit<int>(() => throw exception);
             try
             {
@@ -111,8 +111,8 @@ namespace ThreadPoolRealisationTests
             catch (Exception e)
             {
                 Assert.That(e, Is.TypeOf<AggregateException>());
-                Assert.That(((AggregateException)e).InnerExceptions.Count, Is.EqualTo(1));
-                Assert.That(((AggregateException)e).InnerException, Is.EqualTo(exception));
+                Assert.That(((AggregateException) e).InnerExceptions.Count, Is.EqualTo(1));
+                Assert.That(((AggregateException) e).InnerException, Is.EqualTo(exception));
             }
 
             Assert.That(() => task.Result, Throws.Exception.TypeOf<AggregateException>());
@@ -125,7 +125,7 @@ namespace ThreadPoolRealisationTests
 
             var firstTask = threadPool.Submit(() => 2 * 2);
             var secondTask = firstTask.ContinueWith(x => x.ToString());
-            
+
             Assert.That(firstTask.Result, Is.EqualTo(4));
             Assert.That(secondTask.Result, Is.EqualTo("4"));
             Assert.That(firstTask.IsCompleted, Is.True);
@@ -138,7 +138,7 @@ namespace ThreadPoolRealisationTests
             threadPool = new MyThreadPool(2);
 
             var task = threadPool.Submit(() => 2 + 2);
-            
+
             Assert.That(() => task.ContinueWith<int>(null), Throws.ArgumentNullException);
         }
 
@@ -157,7 +157,7 @@ namespace ThreadPoolRealisationTests
             }
             catch (Exception e)
             {
-                var actualException = ((AggregateException)((AggregateException) e).InnerException)?.InnerException;
+                var actualException = ((AggregateException) ((AggregateException) e).InnerException)?.InnerException;
                 Assert.That(e, Is.TypeOf<AggregateException>());
                 Assert.That(((AggregateException) e).InnerExceptions.Count, Is.EqualTo(1));
                 Assert.That(actualException, Is.EqualTo(exception));
@@ -175,80 +175,80 @@ namespace ThreadPoolRealisationTests
                 Throws.Exception.TypeOf<InvalidOperationException>().And.Message.EqualTo(exceptionMessage));
         }
 
-         [Test]
-         public void Calculate_Task_That_Already_In_ThreadPool_After_Shutdown()
-         {
-             threadPool = new MyThreadPool(1);
-             using var countdownEvent = new CountdownEvent(1);
-             var firstTask = threadPool.Submit(() =>
-             {
-                 countdownEvent.Wait();
-                 Interlocked.Increment(ref callsCount);
-         
-                 return 2 * 2;
-             });
-             var secondTask = threadPool.Submit(() =>
-             {
-                 countdownEvent.Wait();
-                 Interlocked.Increment(ref callsCount);
-         
-                 return 4 * 4;
-             });
-             countdownEvent.Signal();
-             threadPool.Shutdown();
+        [Test]
+        public void Calculate_Task_That_Already_In_ThreadPool_After_Shutdown()
+        {
+            threadPool = new MyThreadPool(1);
+            using var countdownEvent = new CountdownEvent(1);
+            var firstTask = threadPool.Submit(() =>
+            {
+                countdownEvent.Wait();
+                Interlocked.Increment(ref callsCount);
 
-             var firstResult = firstTask.Result;
-             var secondResult = secondTask.Result;
-             
-             Assert.That(callsCount, Is.EqualTo(2));
-             Assert.That(firstResult, Is.EqualTo(4));
-             Assert.That(secondResult, Is.EqualTo(16));
-             Assert.That(firstTask.IsCompleted, Is.True);
-             Assert.That(secondTask.IsCompleted, Is.True);
-         }
+                return 2 * 2;
+            });
+            var secondTask = threadPool.Submit(() =>
+            {
+                countdownEvent.Wait();
+                Interlocked.Increment(ref callsCount);
 
-         [Test]
-         public void Calculate_ContinueWithTask_That_Already_In_ThreadPool_After_Shutdown()
-         {
-             threadPool = new MyThreadPool(1);
-             using var countdownEvent = new CountdownEvent(1);
-             var initialTask = threadPool.Submit(() =>
-             {
-                 countdownEvent.Wait();
-                 Interlocked.Increment(ref callsCount);
-         
-                 return 2 * 2;
-             });
-             var continueWithTask = initialTask.ContinueWith(x =>
-             {
-                 countdownEvent.Wait();
-                 Interlocked.Increment(ref callsCount);
-         
-                 return x.ToString();
-             });
-             countdownEvent.Signal();
-             threadPool.Shutdown();
-         
-             var firstResult = initialTask.Result;
-             var secondResult = continueWithTask.Result;
-         
-             Assert.That(callsCount, Is.EqualTo(2));
-             Assert.That(firstResult, Is.EqualTo(4));
-             Assert.That(secondResult, Is.EqualTo("4"));
-             Assert.That(initialTask.IsCompleted, Is.True);
-             Assert.That(continueWithTask.IsCompleted, Is.True);
-         }
+                return 4 * 4;
+            });
+            countdownEvent.Signal();
+            threadPool.Shutdown();
 
-         [Test]
-         public void Correctly_Shutdown_Without_Tasks()
-         {
-             threadPool = new MyThreadPool(3);
-             
-             threadPool.Shutdown();
-             
-             Assert.Pass();
-         }
-         
+            var firstResult = firstTask.Result;
+            var secondResult = secondTask.Result;
+
+            Assert.That(callsCount, Is.EqualTo(2));
+            Assert.That(firstResult, Is.EqualTo(4));
+            Assert.That(secondResult, Is.EqualTo(16));
+            Assert.That(firstTask.IsCompleted, Is.True);
+            Assert.That(secondTask.IsCompleted, Is.True);
+        }
+
+        [Test]
+        public void Calculate_ContinueWithTask_That_Already_In_ThreadPool_After_Shutdown()
+        {
+            threadPool = new MyThreadPool(1);
+            using var countdownEvent = new CountdownEvent(1);
+            var initialTask = threadPool.Submit(() =>
+            {
+                countdownEvent.Wait();
+                Interlocked.Increment(ref callsCount);
+
+                return 2 * 2;
+            });
+            var continueWithTask = initialTask.ContinueWith(x =>
+            {
+                countdownEvent.Wait();
+                Interlocked.Increment(ref callsCount);
+
+                return x.ToString();
+            });
+            countdownEvent.Signal();
+            threadPool.Shutdown();
+
+            var firstResult = initialTask.Result;
+            var secondResult = continueWithTask.Result;
+
+            Assert.That(callsCount, Is.EqualTo(2));
+            Assert.That(firstResult, Is.EqualTo(4));
+            Assert.That(secondResult, Is.EqualTo("4"));
+            Assert.That(initialTask.IsCompleted, Is.True);
+            Assert.That(continueWithTask.IsCompleted, Is.True);
+        }
+
+        [Test]
+        public void Correctly_Shutdown_Without_Tasks()
+        {
+            threadPool = new MyThreadPool(3);
+
+            threadPool.Shutdown();
+
+            Assert.Pass();
+        }
+
         [Test]
         public void Calculates_Continue_With_Tasks_In_DifferentThreads()
         {
@@ -257,10 +257,10 @@ namespace ThreadPoolRealisationTests
             var initialTask = threadPool.Submit(() =>
             {
                 Interlocked.Increment(ref callsCount);
-                
+
                 return 2 * 2;
             });
-            
+
             var result = initialTask.Result;
             var firstContinueWith = initialTask.ContinueWith(x =>
             {

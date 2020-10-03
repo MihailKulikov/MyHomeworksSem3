@@ -36,18 +36,19 @@ namespace ThreadPoolRealisationTests
                 threads[i] = new Thread(() =>
                 {
                     countdownEvent.Wait();
-        
+
                     tasks.Add(initialTask.ContinueWith(x => x + "2"));
                 });
-        
+
                 threads[i].Start();
             }
+
             countdownEvent.Signal();
             foreach (var thread in threads)
             {
                 thread.Join();
             }
-        
+
             Assert.That(initialTask.Result, Is.EqualTo(4));
             foreach (var task in tasks)
             {
@@ -160,7 +161,7 @@ namespace ThreadPoolRealisationTests
                 threads[i] = new Thread(() =>
                 {
                     countdownEvent.Wait();
-                    tasks.Add( threadPool.Submit(() =>
+                    tasks.Add(threadPool.Submit(() =>
                     {
                         Interlocked.Increment(ref callsCount);
                         Thread.Sleep(10);

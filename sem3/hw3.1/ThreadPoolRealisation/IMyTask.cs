@@ -12,12 +12,12 @@ namespace ThreadPoolRealisation
         /// Gets a value that indicates whether the task has completed.
         /// </summary>
         bool IsCompleted { get; }
-        
+
         /// <summary>
         /// Gets the result value of this <see cref="IMyTask{TResult}"/>.
         /// </summary>
         TResult Result { get; }
-        
+
         /// <summary>
         /// Creates a continuation that executes in the <see cref="MyThreadPool"/> when the target <see cref="IMyTask{TResult}"/> completes.
         /// </summary>
