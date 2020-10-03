@@ -8,7 +8,7 @@ namespace ThreadPoolRealisation
     /// <summary>
     /// Provides a pool of threads that can be used to execute tasks.
     /// </summary>
-    public class MyThreadPool
+    public sealed class MyThreadPool : IDisposable
     {
         private class MyTask<TResult> : IMyTask<TResult>
         {
@@ -212,6 +212,17 @@ namespace ThreadPoolRealisation
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Release all resources used by the current instance of the <see cref="MyThreadPool"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            Shutdown();
+            cancellationTokenSource.Dispose();
+            countdownEventForShutdown.Dispose();
+            collectionOfPendingTasks.Dispose();
         }
     }
 }
