@@ -5,7 +5,7 @@ namespace Client
 {
     public interface IFtpClient : IDisposable
     {
-        public Task<string> List(string path);
-        public Task<char[]> Get(string path);
+        public Task<(string name, bool isDirectory)[]> List(string path);
+        public Task<string> Get(string path);
     }
 }

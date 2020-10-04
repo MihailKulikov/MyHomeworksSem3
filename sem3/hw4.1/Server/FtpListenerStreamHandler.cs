@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Server
@@ -12,7 +13,10 @@ namespace Server
                 var reader = new StreamReader(stream);
                 var writer = new StreamWriter(stream) {AutoFlush = true};
                 var request = await reader.ReadLineAsync();
-                await writer.WriteLineAsync(await FtpRequestHandler.HandleRequest(request));
+                foreach (var symbol in await FtpRequestHandler.HandleRequest(request))
+                {
+                    await writer.WriteAsync(Convert.ToChar(symbol));
+                }
             }
         }
     }

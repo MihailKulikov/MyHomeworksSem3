@@ -10,9 +10,9 @@ namespace Server
     public static class FtpRequestHandler
     {
         private const string InputCommandPattern = "^[12] ..*";
-        private const string ErrorResponse = "-1";
+        private static readonly byte[] ErrorResponse = Encoding.Default.GetBytes("-1");
 
-        public static async Task<string> HandleRequest(string? request)
+        public static async Task<byte[]> HandleRequest(string? request)
         {
             if (request == null)
             {
@@ -34,7 +34,7 @@ namespace Server
             };
         }
 
-        private static string List(string path)
+        private static byte[] List(string path)
         {
             try
             {
@@ -55,8 +55,8 @@ namespace Server
                 {
                     stringBuilder.Append(" true ");
                 }
-
-                return stringBuilder.ToString();
+                stringBuilder.Append(Environment.NewLine);
+                return Encoding.Default.GetBytes(stringBuilder.ToString());
             }
             catch (Exception)
             {
@@ -64,20 +64,9 @@ namespace Server
             }
         }
 
-        private static async Task<string> Get(string path)
+        private static async Task<byte[]> Get(string path)
         {
-            try
-            {
-                var bytes = await File.ReadAllBytesAsync(path);
-                var stringBuilder = new StringBuilder($"{bytes.Length }");
-                stringBuilder.AppendJoin(' ', bytes);
-
-                return stringBuilder.ToString();
-            }
-            catch (Exception)
-            {
-                return ErrorResponse;
-            }
+            return await File.ReadAllBytesAsync(path);
         }
     }
 }

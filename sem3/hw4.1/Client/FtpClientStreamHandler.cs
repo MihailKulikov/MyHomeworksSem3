@@ -16,7 +16,7 @@ namespace Client
             reader = new StreamReader(stream);
         }
 
-        public async Task<string> List(string request)
+        public async Task<(string name, bool isDirectory)[]> List(string request)
         {
             await writer.WriteLineAsync(request);
             var data = await reader.ReadLineAsync();
@@ -24,18 +24,26 @@ namespace Client
             {
                 throw new DirectoryNotFoundException("The specified directory was not found.");
             }
+            var splittedData = data.Split(' ');
+            var size = int.Parse(splittedData[0]);
+            var result = new (string name, bool isDirectory)[size];
+            var resultCounter = 0;
+            while (resultCounter < result.Length)
+            {
+                result[resultCounter] = (splittedData[resultCounter * 2 + 1], bool.Parse(splittedData[resultCounter * 2 + 2]));
+                resultCounter++;
+            }
 
-            return data;
+            return result;
         }
 
-        public async Task<char[]> Get(string request)
+        public async Task<string> Get(string request)
         {
             await writer.WriteLineAsync(request);
             var buffer = new char[long.MaxValue.ToString().Length];
-
             await CheckIfFileNotFound(buffer);
-
-            return await ReadFile(await FindSizeOfFile(buffer));
+            var size = await FindSizeOfFile(buffer);
+            throw new NotImplementedException();
         }
 
         public void Dispose()
@@ -57,13 +65,12 @@ namespace Client
             }
         }
 
-        private async Task<long> FindSizeOfFile(char[] buffer)
+        private async Task<long> FindSizeOfFile(char[] buffer) 
         {
             var spaceIndex = 1;
-            while (buffer[spaceIndex] != ' ')
+            while (buffer[spaceIndex++] != ' ')
             {
                 await reader.ReadAsync(buffer, spaceIndex, 1);
-                spaceIndex++;
             } 
             
             var stringBuilder = new StringBuilder(spaceIndex);

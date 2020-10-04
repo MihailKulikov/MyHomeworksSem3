@@ -47,10 +47,33 @@ namespace Client
                     switch (input[0])
                     {
                         case '1':
-                            await textWriter.WriteLineAsync(await ftpClient.List(input.Substring(2)));
+                            try
+                            {
+                                var result = await ftpClient.List(input.Substring(2));
+                                for (var i = 0; i < result.Length; i++)
+                                {
+                                    await textWriter.WriteAsync($"{result[i].name} {result[i].isDirectory}");
+                                    if (i != result.Length - 1)
+                                    {
+                                        await textWriter.WriteAsync(" ");
+                                    }
+                                    await textWriter.WriteLineAsync();
+                                }
+                            }
+                            catch (DirectoryNotFoundException)
+                            {
+                                await textWriter.WriteLineAsync("Directory not found.");
+                            }
                             break;
                         case '2':
-                            await textWriter.WriteLineAsync(await ftpClient.Get(input.Substring(2)));
+                            try 
+                            {
+                                await textWriter.WriteLineAsync(await ftpClient.Get(input.Substring(2)));
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                await textWriter.WriteLineAsync("File not found.");
+                            }
                             break;
                     }
                 }

@@ -14,10 +14,10 @@ namespace Client
             ftpClientStreamHandler = new FtpClientStreamHandler(tcpClient.GetStream());
         }
 
-        public async Task<string> List(string path)
+        public async Task<(string name, bool isDirectory)[]> List(string path)
             => await ftpClientStreamHandler.List($"1 {path}");
 
-        public async Task<char[]> Get(string path)
+        public async Task<string> Get(string path)
             => await ftpClientStreamHandler.Get($"2 {path}");
         
         public void Dispose()
