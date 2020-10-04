@@ -1,10 +1,9 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace ClientFTP
+namespace Client
 {
-    public class FtpClient : IFtpClient, IDisposable
+    public class FtpClient : IFtpClient
     {
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
@@ -17,7 +16,7 @@ namespace ClientFTP
 
         public async Task<string> MakeRequestAsync(string request)
         {
-            return await FtpClientStreamHandler.HandleRequestAsync(stream, request);
+            return await FtpClientStreamHandler.HandleStreamAsync(stream, request);
         }
         
         public void Dispose()

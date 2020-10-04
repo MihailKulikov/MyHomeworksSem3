@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace ClientFTP
+namespace Client
 {
     internal static class Program
     {
@@ -9,8 +9,7 @@ namespace ClientFTP
         {
             const string host = "localhost";
             const int port = 49001;
-            using var ftpClient = new FtpClient(host, port);
-            var cuiOfFtpClient = new CuiOfFtpClient(ftpClient, Console.Out, Console.In);
+            using var cuiOfFtpClient = new CuiOfFtpClient(new FtpClient(host, port), Console.Out, Console.In);
             await cuiOfFtpClient.Run();
         }
     }

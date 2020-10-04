@@ -3,7 +3,8 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>ServerFTP</RootNamespace>
+        <RootNamespace>Server</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
 </Project>

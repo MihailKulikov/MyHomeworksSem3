@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFTP", "ServerFTP\ServerFTP.csproj", "{6D9A4D87-5DF1-42DA-88EE-BC2D44677DDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{6D9A4D87-5DF1-42DA-88EE-BC2D44677DDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientFTP", "ClientFTP\ClientFTP.csproj", "{94D2F6D9-162C-4B12-A527-2A8F7C2A5547}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{94D2F6D9-162C-4B12-A527-2A8F7C2A5547}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

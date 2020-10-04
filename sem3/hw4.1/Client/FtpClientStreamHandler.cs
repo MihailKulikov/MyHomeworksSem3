@@ -1,17 +1,18 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace ClientFTP
+namespace Client
 {
     public static class FtpClientStreamHandler
     {
-        public static async Task<string> HandleRequestAsync(Stream stream, string request)
+        public static async Task<string> HandleStreamAsync(Stream stream, string request)
         {
-            var writer = new StreamWriter(stream); 
+            //TODO: Different handling for Get and List
+            await using var writer = new StreamWriter(stream) {AutoFlush = true}; 
             await writer.WriteLineAsync(request);
             var reader = new StreamReader(stream);
             var data = await reader.ReadLineAsync();
-            return (string) data;
+            return data ?? "-1";
         }
     }
 }
