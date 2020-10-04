@@ -5,6 +5,7 @@ namespace Client
 {
     public interface IFtpClient : IDisposable
     {
-        public Task<string> MakeRequestAsync(string request);
+        public Task<string> List(string path);
+        public Task<byte[]> Get(string path);
     }
 }

@@ -6,23 +6,24 @@ namespace Client
     public class FtpClient : IFtpClient
     {
         private readonly TcpClient tcpClient;
-        private readonly NetworkStream stream;
-        
+        private readonly FtpClientStreamHandler ftpClientStreamHandler;
+
         public FtpClient(string host, int port)
         {
             tcpClient = new TcpClient(host, port);
-            stream = tcpClient.GetStream();
+            ftpClientStreamHandler = new FtpClientStreamHandler(tcpClient.GetStream());
         }
 
-        public async Task<string> MakeRequestAsync(string request)
-        {
-            return await FtpClientStreamHandler.HandleStreamAsync(stream, request);
-        }
+        public async Task<string> List(string path)
+            => await ftpClientStreamHandler.List($"1 {path}");
+
+        public async Task<byte[]> Get(string path)
+            => await ftpClientStreamHandler.Get($"2 {path}");
         
         public void Dispose()
         {
             tcpClient.Dispose();
-            stream.Dispose();
+            ftpClientStreamHandler.Dispose();
         }
     }
 }

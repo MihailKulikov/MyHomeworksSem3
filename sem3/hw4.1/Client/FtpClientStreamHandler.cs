@@ -1,18 +1,52 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Client
 {
-    public static class FtpClientStreamHandler
+    public class FtpClientStreamHandler : IDisposable
     {
-        public static async Task<string> HandleStreamAsync(Stream stream, string request)
+        private readonly StreamWriter writer;
+        private readonly StreamReader reader;
+
+        public FtpClientStreamHandler(Stream stream)
         {
-            //TODO: Different handling for Get and List
-            await using var writer = new StreamWriter(stream) {AutoFlush = true}; 
+            writer = new StreamWriter(stream) {AutoFlush = true};
+            reader = new StreamReader(stream);
+        }
+
+        public async Task<string> List(string request)
+        {
             await writer.WriteLineAsync(request);
-            var reader = new StreamReader(stream);
             var data = await reader.ReadLineAsync();
-            return data ?? "-1";
+            if (data == null || data == "-1")
+            {
+                throw new DirectoryNotFoundException("The specified directory was not found.");
+            }
+
+            return data;
+        }
+
+        public async Task<byte[]> Get(string request)
+        {
+            await writer.WriteLineAsync(request);
+            var data = await reader.ReadToEndAsync();
+            if (data == "-1")
+            {
+                throw new FileNotFoundException("The specified file was not found.");
+            }
+
+            var splittedData = data.Split(' ');
+            var fileContent = Encoding.Default.GetBytes(splittedData[1]);
+
+            return fileContent;
+        }
+
+        public void Dispose()
+        {
+            writer.Dispose();
+            reader.Dispose();
         }
     }
 }

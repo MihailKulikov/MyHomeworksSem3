@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -41,8 +42,18 @@ namespace Client
                 {
                     await textWriter.WriteLineAsync("Incorrect input :) Try again.");
                 }
-
-                await textWriter.WriteLineAsync(await ftpClient.MakeRequestAsync(input!));
+                else
+                {
+                    switch (input[0])
+                    {
+                        case '1':
+                            await textWriter.WriteLineAsync(await ftpClient.List(input.Substring(2)));
+                            break;
+                        case '2':
+                            await textWriter.WriteLineAsync(Encoding.Default.GetString(await ftpClient.Get(input.Substring(2))));
+                            break;
+                    }
+                }
             }
         }
 
