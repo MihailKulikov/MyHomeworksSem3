@@ -50,7 +50,7 @@ namespace Client
                             await textWriter.WriteLineAsync(await ftpClient.List(input.Substring(2)));
                             break;
                         case '2':
-                            await textWriter.WriteLineAsync(Encoding.Default.GetString(await ftpClient.Get(input.Substring(2))));
+                            await textWriter.WriteLineAsync(await ftpClient.Get(input.Substring(2)));
                             break;
                     }
                 }

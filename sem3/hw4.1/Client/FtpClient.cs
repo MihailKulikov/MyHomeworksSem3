@@ -17,7 +17,7 @@ namespace Client
         public async Task<string> List(string path)
             => await ftpClientStreamHandler.List($"1 {path}");
 
-        public async Task<byte[]> Get(string path)
+        public async Task<char[]> Get(string path)
             => await ftpClientStreamHandler.Get($"2 {path}");
         
         public void Dispose()
