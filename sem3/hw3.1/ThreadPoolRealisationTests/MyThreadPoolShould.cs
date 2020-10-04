@@ -10,6 +10,7 @@ namespace ThreadPoolRealisationTests
     {
         private MyThreadPool threadPool;
         private volatile int callsCount;
+        private const string ThreadPoolShutdownedExceptionMessage = "Thread pool shutdowned.";
 
         [SetUp]
         public void Setup()
@@ -165,14 +166,14 @@ namespace ThreadPoolRealisationTests
         }
 
         [Test]
-        public void Throw_MyThreadPoolShutdownedException_When_Trying_To_Submit_To_Shutdowned_MyThreadPool()
+        public void Throw_InvalidOperationException_When_Trying_To_Submit_To_Shutdowned_MyThreadPool()
         {
-            const string exceptionMessage = "Thread pool shutdowned.";
             threadPool = new MyThreadPool(2);
             threadPool.Shutdown();
 
             Assert.That(() => threadPool.Submit(() => 2 * 2),
-                Throws.Exception.TypeOf<InvalidOperationException>().And.Message.EqualTo(exceptionMessage));
+                Throws.Exception.TypeOf<InvalidOperationException>().And.Message
+                    .EqualTo(ThreadPoolShutdownedExceptionMessage));
         }
 
         [Test]
@@ -327,6 +328,17 @@ namespace ThreadPoolRealisationTests
 
             Assert.That(task.IsCompleted, Is.False);
             countdownEvent.Signal();
+        }
+
+        [Test]
+        public void Throw_InvalidOperationException_When_Trying_To_ContinueWith_When_ThreadPool_Shutdowned()
+        {
+            threadPool = new MyThreadPool(2);
+            var task = threadPool.Submit(() => 2 * 2);
+            threadPool.Shutdown();
+
+            Assert.That(() => task.ContinueWith(x => x.ToString()),
+                Throws.InvalidOperationException.And.Message.EqualTo(ThreadPoolShutdownedExceptionMessage));
         }
 
         [TearDown]

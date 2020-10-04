@@ -49,6 +49,11 @@ namespace ThreadPoolRealisation
                     throw new ArgumentNullException(nameof(continuationFunction));
                 }
 
+                if (threadPool.cancellationTokenSource.IsCancellationRequested)
+                {
+                    throw new InvalidOperationException("Thread pool shutdowned.");
+                }
+
                 var task = new MyTask<TNewResult>(() => continuationFunction(Result), threadPool);
                 if (IsCompleted)
                 {
