@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace hw4._1
+namespace ServerFTP
 {
     class Program
     {

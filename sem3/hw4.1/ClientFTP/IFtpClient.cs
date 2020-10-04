@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace ClientFTP
 {
-    public interface IFtpClient : IDisposable
+    public interface IFtpClient
     {
         public Task<string> MakeRequestAsync(string request);
     }

@@ -1,9 +1,10 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace ClientFTP
 {
-    public class FtpClient : IFtpClient
+    public class FtpClient : IFtpClient, IDisposable
     {
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
