@@ -24,15 +24,8 @@ namespace Server
         {
             while (true)
             {
-                try
-                {
-                    var request = await reader.ReadLineAsync();
-                    await HandleRequest(request);
-                }
-                catch (Exception)
-                {
-                    break;
-                }
+                var request = await reader.ReadLineAsync();
+                await HandleRequest(request);
             }
         }
 
