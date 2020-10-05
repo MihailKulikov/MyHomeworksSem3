@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Client
+namespace Client.Interfaces
 {
     public interface IFtpClient : IDisposable
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Client
@@ -9,7 +10,10 @@ namespace Client
         {
             const string host = "localhost";
             const int port = 49001;
-            using var cuiOfFtpClient = new CuiOfFtpClient(new FtpClient(host, port), Console.Out, Console.In);
+            var tcpClient = new TcpClient(host, port);
+            using var cuiOfFtpClient = new CuiOfFtpClient(
+                new FtpClient(new FtpClientStreamHandler(tcpClient.GetStream())),
+                Console.Out, Console.In);
             await cuiOfFtpClient.Run();
         }
     }

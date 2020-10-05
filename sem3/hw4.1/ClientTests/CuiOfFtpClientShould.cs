@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Client;
+using Client.Interfaces;
 using NUnit.Framework;
 using Moq;
 
