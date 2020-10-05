@@ -24,8 +24,15 @@ namespace Server
         {
             while (true)
             {
-                var request = await reader.ReadLineAsync();
-                await HandleRequest(request);
+                try
+                {
+                    var request = await reader.ReadLineAsync();
+                    await HandleRequest(request);
+                }
+                catch (Exception)
+                {
+                    break;
+                }
             }
         }
 
@@ -39,7 +46,7 @@ namespace Server
 
             var commandCode = request[0];
             var path = request.Substring(2);
-            switch (commandCode) 
+            switch (commandCode)
             {
                 case '1':
                     await List(path);
@@ -71,7 +78,7 @@ namespace Server
                 {
                     stringBuilder.Append(" true ");
                 }
-                
+
                 await writer.WriteLineAsync(stringBuilder.ToString());
             }
             catch (Exception)

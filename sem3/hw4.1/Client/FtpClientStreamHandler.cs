@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Client
@@ -9,7 +10,8 @@ namespace Client
     {
         private readonly StreamWriter writer;
         private readonly StreamReader reader;
-        private const int MaxBufferLength = 4096;
+        private const int BufferSize = 4096;
+        private const string PatternForSplittingListResponse = "( true )|( false )|( true)|( false)";
 
         public FtpClientStreamHandler(Stream stream)
         {
@@ -19,21 +21,20 @@ namespace Client
 
         public async Task<(string name, bool isDirectory)[]> List(string request)
         {
-            //TODO: SHOULD WORK WITH NAMES WITH SPACES
             await writer.WriteLineAsync(request);
             var data = await reader.ReadLineAsync();
             if (data == null || data == "-1")
             {
                 throw new DirectoryNotFoundException("The specified directory was not found.");
             }
-            var splittedData = data.Split(' ');
+
+            var splittedData = data.Split(' ', 2);
             var size = int.Parse(splittedData[0]);
+            var nameAndIsDirStrings = Regex.Split(splittedData[1], PatternForSplittingListResponse);
             var result = new (string name, bool isDirectory)[size];
-            var resultCounter = 0;
-            while (resultCounter < result.Length)
+            for (var i = 0; i < result.Length; i++)
             {
-                result[resultCounter] = (splittedData[resultCounter * 2 + 1], bool.Parse(splittedData[resultCounter * 2 + 2]));
-                resultCounter++;
+                result[i] = (nameAndIsDirStrings[i * 2], bool.Parse(nameAndIsDirStrings[i * 2 + 1]));
             }
 
             return result;
@@ -42,7 +43,7 @@ namespace Client
         public async Task<string> Get(string request)
         {
             await writer.WriteLineAsync(request);
-            
+
             var buffer = new byte[long.MaxValue.ToString().Length];
             await CheckIfFileNotFound(buffer);
             return await DownloadFile(await FindSizeOfFile(buffer));
@@ -56,7 +57,7 @@ namespace Client
 
         private async Task CheckIfFileNotFound(byte[] buffer)
         {
-            for (var i  = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 await reader.BaseStream.ReadAsync(buffer, i, 1);
             }
@@ -68,15 +69,15 @@ namespace Client
             }
         }
 
-        private async Task<long> FindSizeOfFile(byte[] buffer) 
+        private async Task<long> FindSizeOfFile(byte[] buffer)
         {
             var spaceIndex = 1;
             while (buffer[spaceIndex] != ' ')
             {
                 spaceIndex++;
                 await reader.BaseStream.ReadAsync(buffer, spaceIndex, 1);
-            } 
-            
+            }
+
             var stringBuilder = new StringBuilder(spaceIndex);
             for (var i = 0; i < spaceIndex; i++)
             {
@@ -90,7 +91,7 @@ namespace Client
         {
             var fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".txt";
             await using var fileStream = File.Create(fileName);
-            var intermediateStorage = new byte[MaxBufferLength];
+            var intermediateStorage = new byte[BufferSize];
             for (var i = 0; i < size / intermediateStorage.Length; i++)
             {
                 await reader.BaseStream.ReadAsync(intermediateStorage, 0, intermediateStorage.Length);

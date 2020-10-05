@@ -9,8 +9,10 @@ namespace Client
     {
         private const string ExitCode = "qa!";
         private const string InputCommandPattern = "^[12] ..*";
+
         private const string ListCommandInformation =
             "List, request format:\n\t1 <path: String>\n\tpath - path to the directory relative to where the server is running";
+
         private const string GetCommandInformation =
             "Get, request format:\n\t2 <path: String>\n\tpath - path to the file relative to where the server is running";
 
@@ -56,6 +58,7 @@ namespace Client
                                     {
                                         await textWriter.WriteAsync(" ");
                                     }
+
                                     await textWriter.WriteLineAsync();
                                 }
                             }
@@ -63,16 +66,19 @@ namespace Client
                             {
                                 await textWriter.WriteLineAsync("Directory not found.");
                             }
+
                             break;
                         case '2':
-                            try 
+                            try
                             {
-                                await textWriter.WriteLineAsync($"File successfuly downloaded to {await ftpClient.Get(input.Substring(2))}");
+                                await textWriter.WriteLineAsync(
+                                    $"File successfully downloaded to {await ftpClient.Get(input.Substring(2))}");
                             }
                             catch (FileNotFoundException)
                             {
                                 await textWriter.WriteLineAsync("File not found.");
                             }
+
                             break;
                     }
                 }
