@@ -9,7 +9,7 @@ namespace Client
     {
         private const string ExitCode = "qa!";
         private const string InputCommandPattern = "^[12] ..*";
-
+        private const string IncorrectInputMessage = "Incorrect input :) Try again.";
         private const string ListCommandInformation =
             "List, request format:\n\t1 <path: String>\n\tpath - path to the directory relative to where the server is running";
 
@@ -41,7 +41,7 @@ namespace Client
 
                 if (input == null || !Regex.IsMatch(input, InputCommandPattern))
                 {
-                    await textWriter.WriteLineAsync("Incorrect input :) Try again.");
+                    await textWriter.WriteLineAsync(IncorrectInputMessage);
                 }
                 else
                 {
@@ -53,18 +53,12 @@ namespace Client
                                 var result = await ftpClient.List(input.Substring(2));
                                 for (var i = 0; i < result.Length; i++)
                                 {
-                                    await textWriter.WriteAsync($"{result[i].name} {result[i].isDirectory}");
-                                    if (i != result.Length - 1)
-                                    {
-                                        await textWriter.WriteAsync(" ");
-                                    }
-
-                                    await textWriter.WriteLineAsync();
+                                    await textWriter.WriteLineAsync($"{result[i].name} {result[i].isDirectory}");
                                 }
                             }
-                            catch (DirectoryNotFoundException)
+                            catch (DirectoryNotFoundException e)
                             {
-                                await textWriter.WriteLineAsync("Directory not found.");
+                                await textWriter.WriteLineAsync(e.Message);
                             }
 
                             break;
@@ -74,9 +68,9 @@ namespace Client
                                 await textWriter.WriteLineAsync(
                                     $"File successfully downloaded to {await ftpClient.Get(input.Substring(2))}");
                             }
-                            catch (FileNotFoundException)
+                            catch (FileNotFoundException e)
                             {
-                                await textWriter.WriteLineAsync("File not found.");
+                                await textWriter.WriteLineAsync(e.Message);
                             }
 
                             break;
