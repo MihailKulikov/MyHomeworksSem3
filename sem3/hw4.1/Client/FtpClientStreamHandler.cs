@@ -44,9 +44,14 @@ namespace Client
         {
             await writer.WriteLineAsync(request);
 
-            var buffer = new byte[long.MaxValue.ToString().Length];
-            await CheckIfFileNotFound(buffer);
-            return await DownloadFile(await FindSizeOfFile(buffer));
+           
+            var size = await FindSizeOfFile();
+            if (size == -1)
+            {
+                throw new FileNotFoundException();
+            }
+            
+            return await DownloadFile(size);
         }
 
         public void Dispose()
@@ -55,28 +60,16 @@ namespace Client
             reader.Dispose();
         }
 
-        private async Task CheckIfFileNotFound(byte[] buffer)
+        private async Task<long> FindSizeOfFile()
         {
-            for (var i = 0; i < 2; i++)
+            var buffer = new byte[long.MaxValue.ToString().Length + 1];
+            var spaceIndex = 0;
+            do
             {
-                await reader.BaseStream.ReadAsync(buffer, i, 1);
-            }
-
-            if (buffer[0] == '-' && buffer[1] == '1')
-            {
-                await reader.ReadLineAsync();
-                throw new FileNotFoundException("The specified file was not found.");
-            }
-        }
-
-        private async Task<long> FindSizeOfFile(byte[] buffer)
-        {
-            var spaceIndex = 1;
-            while (buffer[spaceIndex] != ' ')
-            {
-                spaceIndex++;
                 await reader.BaseStream.ReadAsync(buffer, spaceIndex, 1);
-            }
+            } while (buffer[spaceIndex++] != ' ');
+
+            spaceIndex--;
 
             var stringBuilder = new StringBuilder(spaceIndex);
             for (var i = 0; i < spaceIndex; i++)
