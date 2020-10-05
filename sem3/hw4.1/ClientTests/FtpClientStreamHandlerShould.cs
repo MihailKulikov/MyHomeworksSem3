@@ -11,7 +11,6 @@ namespace ClientTests
     {
         private FtpClientStreamHandler streamHandler;
         private const int BufferLength = 4096;
-        private byte[] buffer;
         private MemoryStream stream;
         private StreamReader reader;
         private StreamWriter writer;
@@ -19,8 +18,7 @@ namespace ClientTests
         [SetUp]
         public void SetUp()
         {
-            buffer = new byte[BufferLength];
-            stream = new MemoryStream(buffer, 0, buffer.Length);
+            stream = new MemoryStream();
             streamHandler = new FtpClientStreamHandler(stream);
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream) {AutoFlush = true};
@@ -70,7 +68,7 @@ namespace ClientTests
         }
 
         [Test]
-        public async Task CopyToAsync()
+        public async Task CopyToAsync_With_Size_Smaller_Than_Buffer()
         {
             const string value = "Something";
             await writer.WriteLineAsync(value);
@@ -82,26 +80,21 @@ namespace ClientTests
 
             Assert.That(await destinationReader.ReadLineAsync(), Is.EqualTo(value));
         }
-        // [Test]
-        // public void Throw_DirectoryNotFoundException_When_Server_Returns_MinusOne_In_Response_To_List_Command()
-        // {
-        //     const string serverResponse = "-1";
-        //     const string clientRequest = "something";
-        //     streamHandlerMock.Setup(handler => handler.ReadLineAsync()).ReturnsAsync(serverResponse).Verifiable();
-        //
-        //     Assert.That(async () => await requestHandler.List(clientRequest), Throws.TypeOf<DirectoryNotFoundException>());
-        //     streamHandlerMock.Verify();
-        //     streamHandlerMock.Verify(handler => handler.WriteLineAsync(clientRequest), Times.Once);
-        //     streamHandlerMock.VerifyNoOtherCalls();
-        // }
-        //
-        // [Test]
-        // public void Return_Result_According_To_Correct_Server_Response_To_List_Command()
-        // {
-        //     const string serverResponse = "2 FileName false DirectoryName true";
-        //     const string clientRequest = "something";
-        // }
 
+        [Test]
+        public async Task CopyToAsync_With_Size_Bigger_Than_Buffer()
+        {
+            var value = string.Empty.PadRight(BufferLength * 2 + 1, 'a');
+            await writer.WriteLineAsync(value);
+            using var destinationReader = new StreamReader(new MemoryStream());
+            stream.Position = 0;
+
+            await streamHandler.CopyToAsync(destinationReader.BaseStream, value.Length + 1);
+            destinationReader.BaseStream.Position = 0;
+
+            Assert.That(await destinationReader.ReadLineAsync(), Is.EqualTo(value));
+        }
+        
         [TearDown]
         public void TearDown()
         {

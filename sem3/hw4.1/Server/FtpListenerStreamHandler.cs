@@ -60,16 +60,16 @@ namespace Server
                 var directoryPaths = directoryInfo.GetDirectories().Select(info =>
                     Path.GetRelativePath(Directory.GetCurrentDirectory(), info.FullName)).ToList();
                 var stringBuilder = new StringBuilder($"{filePaths.Count + directoryPaths.Count} ");
-                stringBuilder.AppendJoin(" false ", filePaths);
+                stringBuilder.AppendJoin($" {false.ToString()} ", filePaths);
                 if (filePaths.Count != 0)
                 {
-                    stringBuilder.Append(" false ");
+                    stringBuilder.Append($" {false}");
                 }
 
-                stringBuilder.AppendJoin(" true ", directoryPaths);
+                stringBuilder.AppendJoin($" {true} ", directoryPaths);
                 if (directoryPaths.Count != 0)
                 {
-                    stringBuilder.Append(" true ");
+                    stringBuilder.Append($" {true}");
                 }
 
                 await writer.WriteLineAsync(stringBuilder.ToString());
@@ -90,7 +90,8 @@ namespace Server
             }
             catch (Exception)
             {
-                await writer.WriteLineAsync(ErrorResponse);
+                await writer.WriteAsync(ErrorResponse[0]);
+                await writer.WriteAsync(ErrorResponse[1]);
             }
         }
 
