@@ -9,6 +9,7 @@ namespace Client
     {
         private readonly StreamWriter writer;
         private readonly StreamReader reader;
+        private const int MaxBufferLength = 4096;
 
         public FtpClientStreamHandler(Stream stream)
         {
@@ -18,6 +19,7 @@ namespace Client
 
         public async Task<(string name, bool isDirectory)[]> List(string request)
         {
+            //TODO: SHOULD WORK WITH NAMES WITH SPACES
             await writer.WriteLineAsync(request);
             var data = await reader.ReadLineAsync();
             if (data == null || data == "-1")
@@ -40,10 +42,10 @@ namespace Client
         public async Task<string> Get(string request)
         {
             await writer.WriteLineAsync(request);
-            var buffer = new char[long.MaxValue.ToString().Length];
+            
+            var buffer = new byte[long.MaxValue.ToString().Length];
             await CheckIfFileNotFound(buffer);
-            var size = await FindSizeOfFile(buffer);
-            throw new NotImplementedException();
+            return await DownloadFile(await FindSizeOfFile(buffer));
         }
 
         public void Dispose()
@@ -52,60 +54,54 @@ namespace Client
             reader.Dispose();
         }
 
-        private async Task CheckIfFileNotFound(char[] buffer)
+        private async Task CheckIfFileNotFound(byte[] buffer)
         {
             for (var i  = 0; i < 2; i++)
             {
-                await reader.ReadAsync(buffer, i, 1);
+                await reader.BaseStream.ReadAsync(buffer, i, 1);
             }
 
             if (buffer[0] == '-' && buffer[1] == '1')
             {
+                await reader.ReadLineAsync();
                 throw new FileNotFoundException("The specified file was not found.");
             }
         }
 
-        private async Task<long> FindSizeOfFile(char[] buffer) 
+        private async Task<long> FindSizeOfFile(byte[] buffer) 
         {
             var spaceIndex = 1;
-            while (buffer[spaceIndex++] != ' ')
+            while (buffer[spaceIndex] != ' ')
             {
-                await reader.ReadAsync(buffer, spaceIndex, 1);
+                spaceIndex++;
+                await reader.BaseStream.ReadAsync(buffer, spaceIndex, 1);
             } 
             
             var stringBuilder = new StringBuilder(spaceIndex);
             for (var i = 0; i < spaceIndex; i++)
             {
-                stringBuilder.Append(buffer[i]);
+                stringBuilder.Append(Convert.ToChar(buffer[i]));
             }
 
             return long.Parse(stringBuilder.ToString());
         }
 
-        private async Task<char[]> ReadFile(long size)
+        private async Task<string> DownloadFile(long size)
         {
-            var fileContent = new char[size];
-            var count = 0L;
-            var intermediateStorage = new char[int.MaxValue];
-            for (var i = 0; i < size / int.MaxValue; i++)
+            var fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".txt";
+            await using var fileStream = File.Create(fileName);
+            var intermediateStorage = new byte[MaxBufferLength];
+            for (var i = 0; i < size / intermediateStorage.Length; i++)
             {
-                await reader.ReadAsync(intermediateStorage, 0, int.MaxValue);
+                await reader.BaseStream.ReadAsync(intermediateStorage, 0, intermediateStorage.Length);
 
-                foreach (var symbol in intermediateStorage)
-                {
-                    fileContent[count] = symbol;
-                    count++;
-                }
+                await fileStream.WriteAsync(intermediateStorage);
             }
 
-            await reader.ReadAsync(intermediateStorage, 0, (int) size % int.MaxValue);
-            foreach (var symbol in intermediateStorage)
-            {
-                fileContent[count] = symbol;
-                count++;
-            }
+            await reader.BaseStream.ReadAsync(intermediateStorage, 0, (int) size % intermediateStorage.Length);
+            await fileStream.WriteAsync(intermediateStorage, 0, (int) size % intermediateStorage.Length);
 
-            return fileContent;
+            return fileName;
         }
     }
 }

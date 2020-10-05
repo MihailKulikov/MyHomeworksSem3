@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -68,7 +67,7 @@ namespace Client
                         case '2':
                             try 
                             {
-                                await textWriter.WriteLineAsync(await ftpClient.Get(input.Substring(2)));
+                                await textWriter.WriteLineAsync($"File successfuly downloaded to {await ftpClient.Get(input.Substring(2))}");
                             }
                             catch (FileNotFoundException)
                             {

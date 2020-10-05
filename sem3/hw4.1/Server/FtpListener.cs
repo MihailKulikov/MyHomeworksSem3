@@ -19,8 +19,8 @@ namespace Server
             while (true)
             {
                 var client = await tcpListener.AcceptTcpClientAsync();
-
-                Task.Run(async () => await FtpListenerStreamHandler.HandleStreamAsync(client.GetStream()));
+                var ftpListenerStreamHandler = new FtpListenerStreamHandler(client.GetStream());
+                Task.Run(async () => await ftpListenerStreamHandler.HandleStreamAsync());
             }
         }
     }
