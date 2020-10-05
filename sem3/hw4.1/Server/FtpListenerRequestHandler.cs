@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class FtpListenerStreamHandler : IDisposable
+    public class FtpListenerRequestHandler : IDisposable
     {
         private const string InputCommandPattern = "^[12] ..*";
         private const string ErrorResponse = "-1";
         private readonly StreamReader reader;
         private readonly StreamWriter writer;
 
-        public FtpListenerStreamHandler(Stream stream)
+        public FtpListenerRequestHandler(Stream stream)
         {
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream) {AutoFlush = true};
