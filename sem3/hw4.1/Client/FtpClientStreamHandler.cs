@@ -15,7 +15,7 @@ namespace Client
         private const int BufferSize = 4096;
 
         /// <summary>
-        /// Initialize new instance of the <see cref="FtpClientStreamHandler"/> class which working with specified stream.
+        /// Initialize new instance of the <see cref="FtpClientStreamHandler"/> class that works with specified stream.
         /// </summary>
         /// <param name="stream">Specified stream.</param>
         public FtpClientStreamHandler(Stream stream)

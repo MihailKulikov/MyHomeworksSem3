@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Server
 {
+    /// <summary>
+    /// Represents request handler for SimpleFTP server.
+    /// </summary>
     public class FtpListenerRequestHandler : IDisposable
     {
         private const string InputCommandPattern = "^[12] ..*";
@@ -14,12 +17,21 @@ namespace Server
         private readonly StreamReader reader;
         private readonly StreamWriter writer;
 
+        /// <summary>
+        /// Initialize a new instance of the <see cref="FtpListenerRequestHandler"/> class that works with specified stream. 
+        /// </summary>
+        /// <param name="stream">Specified stream.</param>
         public FtpListenerRequestHandler(Stream stream)
         {
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream) {AutoFlush = true};
         }
 
+        /// <summary>
+        /// Handles request from the SimpleFTP client.
+        /// </summary>
+        /// <param name="request">Request from SimpleFTP client.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task HandleRequestAsync(string request)
         {
             if (!Regex.IsMatch(request, InputCommandPattern))
@@ -87,6 +99,9 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Releases all resources used by <see cref="FtpListenerRequestHandler"/> object.
+        /// </summary>
         public void Dispose()
         {
             reader.Dispose();
