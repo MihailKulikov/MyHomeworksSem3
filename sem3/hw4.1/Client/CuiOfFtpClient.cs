@@ -7,6 +7,9 @@ using Client.Interfaces;
 
 namespace Client
 {
+    /// <summary>
+    /// Represents CUI for SimpleFTP client.
+    /// </summary>
     public class CuiOfFtpClient : IDisposable
     {
         private const string ExitCode = "qa!";
@@ -35,6 +38,12 @@ namespace Client
         private readonly TextWriter textWriter;
         private readonly TextReader textReader;
 
+        /// <summary>
+        /// Initialize a new instance of the <see cref="CuiOfFtpClient"/> class with specified <see cref="IFtpClient"/>, <see cref="TextWriter"/>, <see cref="TextReader"/> instances.
+        /// </summary>
+        /// <param name="ftpClient">Specified <see cref="IFtpClient"/></param>
+        /// <param name="textWriter">Specified <see cref="TextWriter"/></param>
+        /// <param name="textReader">Specified <see cref="TextReader"/></param>
         public CuiOfFtpClient(IFtpClient ftpClient, TextWriter textWriter, TextReader textReader)
         {
             this.ftpClient = ftpClient;
@@ -42,6 +51,10 @@ namespace Client
             this.textReader = textReader;
         }
 
+        /// <summary>
+        /// Launches CUI.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task Run()
         {
             await ShowIntroduction();
@@ -79,7 +92,7 @@ namespace Client
             try
             {
                 await textWriter.WriteLineAsync(
-                    $"File successfully downloaded to {await ftpClient.Get(path.Substring(2))}");
+                    $"File successfully downloaded to {await ftpClient.GetAsync(path)}");
             }
             catch (FileNotFoundException e)
             {
@@ -91,10 +104,10 @@ namespace Client
         {
             try
             {
-                var result = await ftpClient.List(path.Substring(2));
-                for (var i = 0; i < result.Length; i++)
+                var result = await ftpClient.ListAsync(path);
+                foreach (var (name, isDirectory) in result)
                 {
-                    await textWriter.WriteLineAsync($"{result[i].name} {result[i].isDirectory}");
+                    await textWriter.WriteLineAsync($"{name} {isDirectory}");
                 }
             }
             catch (DirectoryNotFoundException e)
@@ -111,6 +124,9 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// Releases all resources used by the <see cref="CuiOfFtpClient"/> object.
+        /// </summary>
         public void Dispose()
         {
             ftpClient.Dispose();

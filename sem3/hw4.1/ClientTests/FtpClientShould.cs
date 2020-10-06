@@ -29,7 +29,7 @@ namespace ClientTests
                 .ReturnsAsync(serverResponse)
                 .Verifiable();
 
-            Assert.That(async () => await ftpClient.List(clientRequest), Throws.TypeOf<DirectoryNotFoundException>());
+            Assert.That(async () => await ftpClient.ListAsync(clientRequest), Throws.TypeOf<DirectoryNotFoundException>());
             streamHandlerMock.Verify();
             streamHandlerMock.Verify(handler => handler.WriteLineAsync($"1 {clientRequest}"), Times.Once);
             streamHandlerMock.VerifyNoOtherCalls();
@@ -44,7 +44,7 @@ namespace ClientTests
                 .ReturnsAsync(serverResponse)
                 .Verifiable();
 
-            Assert.That(await ftpClient.List(clientRequest),
+            Assert.That(await ftpClient.ListAsync(clientRequest),
                 Is.EquivalentTo(new[] {("FileName", false), ("DirectoryName", true)}));
             streamHandlerMock.Verify();
             streamHandlerMock.Verify(handler => handler.WriteLineAsync($"1 {clientRequest}"), Times.Once);
@@ -62,7 +62,7 @@ namespace ClientTests
                     buffer[1] = Convert.ToByte('1');
                 });
 
-            Assert.That(async () => await ftpClient.Get(clientRequest), Throws.TypeOf<FileNotFoundException>());
+            Assert.That(async () => await ftpClient.GetAsync(clientRequest), Throws.TypeOf<FileNotFoundException>());
             streamHandlerMock.Verify(handler => handler.ReadAsync(It.IsAny<byte[]>(), 0, 2), Times.Once);
             streamHandlerMock.Verify(handler => handler.WriteLineAsync($"2 {clientRequest}"), Times.Once);
             streamHandlerMock.VerifyNoOtherCalls();
@@ -89,7 +89,7 @@ namespace ClientTests
             streamHandlerMock.Setup(handler => handler.CopyToAsync(It.IsAny<FileStream>(), 10))
                 .Callback((Stream stream, long size) => { usedByClientFileStream = (FileStream) stream; });
 
-            Assert.That(await ftpClient.Get(clientRequest),
+            Assert.That(await ftpClient.GetAsync(clientRequest),
                 Is.EqualTo(Path.GetRelativePath(Directory.GetCurrentDirectory(), usedByClientFileStream.Name)));
             streamHandlerMock.Verify(handler => handler.ReadAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()),
                 Times.AtLeastOnce);

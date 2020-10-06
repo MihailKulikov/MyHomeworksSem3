@@ -76,7 +76,7 @@ namespace ClientTests
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
                 .ReturnsAsync("1 someDirectory")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.List("someDirectory"))
+            ftpClientMock.Setup(client => client.ListAsync("someDirectory"))
                 .ReturnsAsync(new (string name, bool isDirectory)[] {("file", false), ("directory", true)})
                 .Verifiable();
 
@@ -99,7 +99,7 @@ namespace ClientTests
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
                 .ReturnsAsync("1 someDirectory")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.List("someDirectory"))
+            ftpClientMock.Setup(client => client.ListAsync("someDirectory"))
                 .ThrowsAsync(new DirectoryNotFoundException(exceptionMessage))
                 .Verifiable();
 
@@ -122,7 +122,7 @@ namespace ClientTests
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
                 .ReturnsAsync("2 someFile")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.Get("someFile"))
+            ftpClientMock.Setup(client => client.GetAsync("someFile"))
                 .ReturnsAsync(resultOfGetCommand)
                 .Verifiable();
 
@@ -144,7 +144,7 @@ namespace ClientTests
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
                 .ReturnsAsync("2 someFile")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.Get("someFile"))
+            ftpClientMock.Setup(client => client.GetAsync("someFile"))
                 .ThrowsAsync(new FileNotFoundException(exceptionMessage))
                 .Verifiable();
 

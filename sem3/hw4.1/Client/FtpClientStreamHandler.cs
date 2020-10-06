@@ -5,12 +5,19 @@ using Client.Interfaces;
 
 namespace Client
 {
+    /// <summary>
+    /// Represents implementation of a <see cref="IFtpClientStreamHandler"/>.
+    /// </summary>
     public class FtpClientStreamHandler : IFtpClientStreamHandler
     {
         private readonly StreamWriter streamWriter;
         private readonly StreamReader streamReader;
         private const int BufferSize = 4096;
 
+        /// <summary>
+        /// Initialize new instance of the <see cref="FtpClientStreamHandler"/> class which working with specified stream.
+        /// </summary>
+        /// <param name="stream">Specified stream.</param>
         public FtpClientStreamHandler(Stream stream)
         {
             streamReader = new StreamReader(stream);
@@ -45,6 +52,9 @@ namespace Client
             await destination.WriteAsync(intermediateStorage, 0, (int) count % intermediateStorage.Length);
         }
 
+        /// <summary>
+        /// Release all resources used by <see cref="FtpClientStreamHandler"/> object.
+        /// </summary>
         public void Dispose()
         {
             streamWriter.Dispose();
