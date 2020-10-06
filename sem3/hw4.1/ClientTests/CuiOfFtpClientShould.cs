@@ -15,6 +15,7 @@ namespace ClientTests
         private Mock<TextReader> textReaderMock;
         private const string IncorrectInputMessage = "Incorrect input :) Try again.";
         private const string ExitCode = "qa!";
+
         private const string ListCommandInformation =
             "List, request format:\n\t1 <path: String>\n\tpath - path to the directory relative to where the server is running";
 
@@ -30,7 +31,7 @@ namespace ClientTests
             textWriterMock.Verify(writer => writer.WriteLineAsync(GetCommandInformation), Times.Once);
             textWriterMock.Verify(writer => writer.WriteLineAsync(exitCodeInformation), Times.Once);
         }
-        
+
         [SetUp]
         public void SetUp()
         {
@@ -46,7 +47,7 @@ namespace ClientTests
             textReaderMock.Setup(reader => reader.ReadLineAsync()).ReturnsAsync(ExitCode).Verifiable();
 
             await cui.Run();
-            
+
             textReaderMock.Verify();
             textReaderMock.VerifyNoOtherCalls();
             VerifyIntroductionWasWritten();
@@ -73,14 +74,14 @@ namespace ClientTests
         public async Task Show_Result_Of_Correct_List_Command()
         {
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
-                .ReturnsAsync("1 somedirectory")
+                .ReturnsAsync("1 someDirectory")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.List("somedirectory"))
+            ftpClientMock.Setup(client => client.List("someDirectory"))
                 .ReturnsAsync(new (string name, bool isDirectory)[] {("file", false), ("directory", true)})
                 .Verifiable();
 
             await cui.Run();
-            
+
             ftpClientMock.Verify();
             ftpClientMock.VerifyNoOtherCalls();
             textReaderMock.Verify(reader => reader.ReadLineAsync(), Times.Exactly(2));
@@ -96,14 +97,14 @@ namespace ClientTests
         {
             const string exceptionMessage = "Directory not found.";
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
-                .ReturnsAsync("1 somedirectory")
+                .ReturnsAsync("1 someDirectory")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.List("somedirectory"))
+            ftpClientMock.Setup(client => client.List("someDirectory"))
                 .ThrowsAsync(new DirectoryNotFoundException(exceptionMessage))
                 .Verifiable();
 
             await cui.Run();
-            
+
             ftpClientMock.Verify();
             ftpClientMock.VerifyNoOtherCalls();
             textReaderMock.Verify(reader => reader.ReadLineAsync(), Times.Exactly(2));
@@ -119,14 +120,14 @@ namespace ClientTests
             const string resultOfGetCommand = "some path";
             var expectedMessage = $"File successfully downloaded to {resultOfGetCommand}";
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
-                .ReturnsAsync("2 somefile")
+                .ReturnsAsync("2 someFile")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.Get("somefile"))
+            ftpClientMock.Setup(client => client.Get("someFile"))
                 .ReturnsAsync(resultOfGetCommand)
                 .Verifiable();
 
             await cui.Run();
-            
+
             ftpClientMock.Verify();
             ftpClientMock.VerifyNoOtherCalls();
             textReaderMock.Verify(reader => reader.ReadLineAsync(), Times.Exactly(2));
@@ -141,14 +142,14 @@ namespace ClientTests
         {
             const string exceptionMessage = "File not found.";
             textReaderMock.SetupSequence(reader => reader.ReadLineAsync())
-                .ReturnsAsync("2 somefile")
+                .ReturnsAsync("2 someFile")
                 .ReturnsAsync(ExitCode);
-            ftpClientMock.Setup(client => client.Get("somefile"))
+            ftpClientMock.Setup(client => client.Get("someFile"))
                 .ThrowsAsync(new FileNotFoundException(exceptionMessage))
                 .Verifiable();
 
             await cui.Run();
-            
+
             ftpClientMock.Verify();
             ftpClientMock.VerifyNoOtherCalls();
             textReaderMock.Verify(reader => reader.ReadLineAsync(), Times.Exactly(2));

@@ -20,18 +20,9 @@ namespace Server
             writer = new StreamWriter(stream) {AutoFlush = true};
         }
 
-        public async Task HandleStreamAsync()
+        public async Task HandleRequestAsync(string request)
         {
-            while (true)
-            {
-                var request = await reader.ReadLineAsync();
-                await HandleRequest(request);
-            }
-        }
-
-        private async Task HandleRequest(string? request)
-        {
-            if (request == null || !Regex.IsMatch(request, InputCommandPattern))
+            if (!Regex.IsMatch(request, InputCommandPattern))
             {
                 await writer.WriteLineAsync(ErrorResponse);
                 return;
@@ -84,9 +75,10 @@ namespace Server
         {
             try
             {
-                await using var fileStream = new FileStream(path, FileMode.Open);
+                var fileStream = new FileStream(path, FileMode.Open);
                 await writer.WriteAsync(new FileInfo(path).Length + " ");
                 await fileStream.CopyToAsync(writer.BaseStream);
+                fileStream.Close();
             }
             catch (Exception)
             {

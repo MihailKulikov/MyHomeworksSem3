@@ -43,21 +43,21 @@ namespace Client
 
             return result;
         }
-        
+
         public async Task<string> Get(string path)
         {
             var request = $"2 {path}";
             await streamHandler.WriteLineAsync(request);
-            
+
             var size = await FindSizeOfFile();
             if (size == -1)
             {
                 throw new FileNotFoundException();
             }
-            
+
             return await DownloadFile(size);
         }
-        
+
         private async Task<long> FindSizeOfFile()
         {
             var buffer = new byte[long.MaxValue.ToString().Length + 1];
@@ -67,7 +67,7 @@ namespace Client
             {
                 return -1;
             }
-            
+
             var spaceIndex = 1;
             while (buffer[spaceIndex] != ' ')
             {

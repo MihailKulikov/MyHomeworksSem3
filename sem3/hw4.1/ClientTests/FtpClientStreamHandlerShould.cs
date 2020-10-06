@@ -31,7 +31,7 @@ namespace ClientTests
 
             await streamHandler.WriteLineAsync(expectedResult);
             stream.Position = 0;
-            
+
             Assert.That(await reader.ReadLineAsync(), Is.EqualTo(expectedResult));
         }
 
@@ -39,7 +39,7 @@ namespace ClientTests
         public async Task ReadLineAsync()
         {
             const string expectedResult = "something";
-            
+
             await writer.WriteLineAsync(expectedResult);
             stream.Position = 0;
 
@@ -54,8 +54,8 @@ namespace ClientTests
             stream.Position = 0;
 
             await streamHandler.ReadAsync(testBuffer, 1, 1);
-            
-            Assert.That(testBuffer, Is.EquivalentTo(new []{0, 54}));
+
+            Assert.That(testBuffer, Is.EquivalentTo(new[] {0, 54}));
         }
 
         [Test]
@@ -94,11 +94,14 @@ namespace ClientTests
 
             Assert.That(await destinationReader.ReadLineAsync(), Is.EqualTo(value));
         }
-        
+
         [TearDown]
         public void TearDown()
         {
             streamHandler.Dispose();
+            stream.Dispose();
+            writer.Dispose();
+            reader.Dispose();
         }
     }
 }

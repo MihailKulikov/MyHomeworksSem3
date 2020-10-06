@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,11 +12,23 @@ namespace Client
         private const string ExitCode = "qa!";
         private const string InputCommandPattern = "^[12] ..*";
         private const string IncorrectInputMessage = "Incorrect input :) Try again.";
+
         private const string ListCommandInformation =
             "List, request format:\n\t1 <path: String>\n\tpath - path to the directory relative to where the server is running";
 
         private const string GetCommandInformation =
             "Get, request format:\n\t2 <path: String>\n\tpath - path to the file relative to where the server is running";
+
+        private IEnumerable<string> IntroductionMessages
+        {
+            get
+            {
+                yield return "Connection established.";
+                yield return ListCommandInformation;
+                yield return GetCommandInformation;
+                yield return exitCodeInformation;
+            }
+        }
 
         private readonly string exitCodeInformation = $"Exit, request format:\n\t{ExitCode}";
         private readonly IFtpClient ftpClient;
@@ -49,30 +62,11 @@ namespace Client
                     switch (input[0])
                     {
                         case '1':
-                            try
-                            {
-                                var result = await ftpClient.List(input.Substring(2));
-                                for (var i = 0; i < result.Length; i++)
-                                {
-                                    await textWriter.WriteLineAsync($"{result[i].name} {result[i].isDirectory}");
-                                }
-                            }
-                            catch (DirectoryNotFoundException e)
-                            {
-                                await textWriter.WriteLineAsync(e.Message);
-                            }
+                            await ShowListResult(input.Substring(2));
 
                             break;
                         case '2':
-                            try
-                            {
-                                await textWriter.WriteLineAsync(
-                                    $"File successfully downloaded to {await ftpClient.Get(input.Substring(2))}");
-                            }
-                            catch (FileNotFoundException e)
-                            {
-                                await textWriter.WriteLineAsync(e.Message);
-                            }
+                            await ShowGetResult(input.Substring(2));
 
                             break;
                     }
@@ -80,12 +74,41 @@ namespace Client
             }
         }
 
+        private async Task ShowGetResult(string path)
+        {
+            try
+            {
+                await textWriter.WriteLineAsync(
+                    $"File successfully downloaded to {await ftpClient.Get(path.Substring(2))}");
+            }
+            catch (FileNotFoundException e)
+            {
+                await textWriter.WriteLineAsync(e.Message);
+            }
+        }
+
+        private async Task ShowListResult(string path)
+        {
+            try
+            {
+                var result = await ftpClient.List(path.Substring(2));
+                for (var i = 0; i < result.Length; i++)
+                {
+                    await textWriter.WriteLineAsync($"{result[i].name} {result[i].isDirectory}");
+                }
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                await textWriter.WriteLineAsync(e.Message);
+            }
+        }
+
         private async Task ShowIntroduction()
         {
-            await textWriter.WriteLineAsync("Connection established.");
-            await textWriter.WriteLineAsync(ListCommandInformation);
-            await textWriter.WriteLineAsync(GetCommandInformation);
-            await textWriter.WriteLineAsync(exitCodeInformation);
+            foreach (var message in IntroductionMessages)
+            {
+                await textWriter.WriteLineAsync(message);
+            }
         }
 
         public void Dispose()

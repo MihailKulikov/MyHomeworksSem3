@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -19,19 +19,37 @@ namespace Server
             tcpListener.Start();
             while (true)
             {
-                var client = await tcpListener.AcceptTcpClientAsync();
-                var ftpListenerStreamHandler = new FtpListenerRequestHandler(client.GetStream());
-                Task.Run(async () =>
+                try
                 {
-                    try
+                    var client = await tcpListener.AcceptTcpClientAsync();
+                    Task.Run(async () => await HandleRequests(client.GetStream()));
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+        }
+
+        private static async Task HandleRequests(Stream stream)
+        {
+            using var reader = new StreamReader(stream);
+            using var ftpListenerRequestHandler = new FtpListenerRequestHandler(stream);
+            while (true)
+            {
+                try
+                {
+                    var request = await reader.ReadLineAsync();
+                    if (request != null)
                     {
-                        await ftpListenerStreamHandler.HandleStreamAsync();
+                        await ftpListenerRequestHandler.HandleRequestAsync(request);
                     }
-                    catch (Exception)
-                    {
-                        ftpListenerStreamHandler.Dispose();
-                    }
-                });
+                }
+                catch
+                {
+                    ftpListenerRequestHandler.Dispose();
+                    break;
+                }
             }
         }
     }

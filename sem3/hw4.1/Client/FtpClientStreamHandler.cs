@@ -10,7 +10,7 @@ namespace Client
         private readonly StreamWriter streamWriter;
         private readonly StreamReader streamReader;
         private const int BufferSize = 4096;
-        
+
         public FtpClientStreamHandler(Stream stream)
         {
             streamReader = new StreamReader(stream);
