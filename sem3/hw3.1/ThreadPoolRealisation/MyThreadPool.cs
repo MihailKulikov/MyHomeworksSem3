@@ -206,15 +206,16 @@ namespace ThreadPoolRealisation
                 }
                 else
                 {
+                    Action taskRunAction = null;
                     try
                     {
-                        var taskRunAction = collectionOfPendingTasks.Take(cancellationToken);
-
-                        taskRunAction.Invoke();
+                        taskRunAction = collectionOfPendingTasks.Take(cancellationToken);
                     }
                     catch (OperationCanceledException)
                     {
                     }
+
+                    taskRunAction?.Invoke();
                 }
             }
         }
