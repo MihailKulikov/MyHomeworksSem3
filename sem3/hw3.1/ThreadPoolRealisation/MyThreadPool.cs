@@ -91,11 +91,10 @@ namespace ThreadPoolRealisation
                 {
                     lock (queueOfContinueWithTasks)
                     {
-                        var taskSubmitCount = queueOfContinueWithTasks.Count;
-                        for (var i = 0; i < taskSubmitCount; i++)
+                        while (queueOfContinueWithTasks.Count != 0)
                         {
                             queueOfContinueWithTasks.Dequeue().Invoke();
-                        }
+                        }    
 
                         IsCompleted = true;
                     }
@@ -115,9 +114,10 @@ namespace ThreadPoolRealisation
                 return result;
             }
 
-            ~MyTask()
+            public void Dispose()
             {
                 manualResetEvent.Dispose();
+                threadPool.Dispose();
             }
         }
 

@@ -6,7 +6,7 @@ namespace ThreadPoolRealisation
     /// Represents an operation that executes in the <see cref="MyThreadPool"/>.
     /// </summary>
     /// <typeparam name="TResult">The type of the result produced by the <see cref="IMyTask{TResult}"/></typeparam>
-    public interface IMyTask<out TResult>
+    public interface IMyTask<out TResult> : IDisposable
     {
         /// <summary>
         /// Gets a value that indicates whether the task has completed.
@@ -14,7 +14,7 @@ namespace ThreadPoolRealisation
         bool IsCompleted { get; }
 
         /// <summary>
-        /// Gets the result value of this <see cref="IMyTask{TResult}"/>.
+        /// Gets the result value of this <see cref="IMyTask{TResult}"/>. Blocks the caller until the result is ready.
         /// </summary>
         TResult Result { get; }
 
