@@ -54,27 +54,23 @@ namespace ThreadPoolRealisation
                     throw new InvalidOperationException("Thread pool shutdowned.");
                 }
 
-                var task = new MyTask<TNewResult>(() => continuationFunction(Result), threadPool);
+                TNewResult Func() => continuationFunction(Result);
                 if (IsCompleted)
                 {
-                    threadPool.Submit(task);
-                }
-                else
-                {
-                    lock (queueOfContinueWithTasks)
-                    {
-                        if (IsCompleted)
-                        {
-                            threadPool.Submit(task);
-                        }
-                        else
-                        {
-                            queueOfContinueWithTasks.Enqueue(() => threadPool.Submit(task));
-                        }
-                    }
+                    return threadPool.Submit(Func);
                 }
 
-                return task;
+                lock (queueOfContinueWithTasks)
+                {
+                    if (IsCompleted)
+                    {
+                        return threadPool.Submit(Func);
+                    }
+
+                    var task = new MyTask<TNewResult>(Func, threadPool);
+                    queueOfContinueWithTasks.Enqueue(() => threadPool.Submit(task));
+                    return task;
+                }
             }
 
             public void Run()
@@ -161,13 +157,15 @@ namespace ThreadPoolRealisation
                 throw new ArgumentNullException(nameof(func));
             }
 
-            if (cancellationTokenSource.IsCancellationRequested)
+            var task = new MyTask<TResult>(func, this);
+            try
+            {
+                collectionOfPendingTasks.Add(task.Run, cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
             {
                 throw new InvalidOperationException("Thread pool shutdowned.");
             }
-
-            var task = new MyTask<TResult>(func, this);
-            collectionOfPendingTasks.Add(task.Run);
 
             return task;
         }
