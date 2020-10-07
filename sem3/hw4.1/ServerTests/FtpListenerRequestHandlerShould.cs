@@ -73,15 +73,20 @@ namespace ServerTests
             var initialDirectoryInfo = Directory.CreateDirectory(initialDirectoryPath);
             Directory.CreateDirectory(testDirectoryPath);
             var fileStream = File.Create(testFilePath);
+            try
+            {
+                await ftpListenerRequestHandler.HandleRequestAsync($"1 {initialDirectoryPath}");
+                testStream.Position = 0;
 
-            await ftpListenerRequestHandler.HandleRequestAsync($"1 {initialDirectoryPath}");
-            testStream.Position = 0;
-
-            var (size, paths) = ParseServerResponse(await reader.ReadLineAsync());
-            fileStream.Close();
-            initialDirectoryInfo.Delete(true);
-            Assert.That(size, Is.EqualTo(2));
-            Assert.That(paths, Is.EquivalentTo(new[] {(testDirectoryPath, true), (testFilePath, false)}));
+                var (size, paths) = ParseServerResponse(await reader.ReadLineAsync());
+                Assert.That(size, Is.EqualTo(2));
+                Assert.That(paths, Is.EquivalentTo(new[] {(testDirectoryPath, true), (testFilePath, false)}));
+            }
+            finally
+            {
+                fileStream.Close();
+                initialDirectoryInfo.Delete(true);
+            }
         }
 
         [Test]
@@ -94,16 +99,21 @@ namespace ServerTests
             await fileStreamWriter.WriteLineAsync(message);
             fileStream.Close();
 
-            await ftpListenerRequestHandler.HandleRequestAsync($"2 {testFilePath}");
-            testStream.Position = 0;
+            try
+            {
+                await ftpListenerRequestHandler.HandleRequestAsync($"2 {testFilePath}");
+                testStream.Position = 0;
 
-            var actualMessage = await reader.ReadLineAsync();
-            var buffer = new char[1];
-            await reader.ReadAsync(buffer, 0, 1);
-            Assert.That(actualMessage, Is.EqualTo($"{message.Length + Environment.NewLine.Length} {message}"));
-            Assert.That(buffer[0], Is.EqualTo('\0'));
-
-            File.Delete(testFilePath);
+                var actualMessage = await reader.ReadLineAsync();
+                var buffer = new char[1];
+                await reader.ReadAsync(buffer, 0, 1);
+                Assert.That(actualMessage, Is.EqualTo($"{message.Length + Environment.NewLine.Length} {message}"));
+                Assert.That(buffer[0], Is.EqualTo('\0'));
+            }
+            finally
+            {
+                File.Delete(testFilePath);
+            }
         }
 
         [TearDown]
