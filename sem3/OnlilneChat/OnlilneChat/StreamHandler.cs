@@ -19,7 +19,7 @@ namespace OnlineChat
 
         public async Task WriteToStream()
         {
-            await using var streamWriter = new StreamWriter(stream) {AutoFlush = true};
+            var streamWriter = new StreamWriter(stream) {AutoFlush = true};
             while (true)
             {
                 var data = await textReader.ReadLineAsync();
@@ -33,7 +33,7 @@ namespace OnlineChat
 
         public async Task ReadFromStream()
         {
-            using var streamReader = new StreamReader(stream);
+            var streamReader = new StreamReader(stream);
             while (true)
             {
                 var data = await streamReader.ReadLineAsync();
