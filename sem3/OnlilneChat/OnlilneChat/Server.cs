@@ -6,15 +6,27 @@ using System.Threading.Tasks;
 
 namespace OnlineChat
 {
+    /// <summary>
+    /// Represents server for online chat.
+    /// </summary>
     public class Server
     {
         private readonly TcpListener tcpListener;
 
+        /// <summary>
+        /// Initialize new instance of the <see cref="Server"/> class with specified Ip address and port.
+        /// </summary>
+        /// <param name="ipAddress">Specified ip address.</param>
+        /// <param name="port">Specified port.</param>
         public Server(IPAddress ipAddress, int port)
         {
             tcpListener = new TcpListener(ipAddress, port);
         }
 
+        /// <summary>
+        /// Starts server for reading and writing.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task Start()
         {
             tcpListener.Start();
