@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>MyNUnit.Runner</AssemblyName>
+        <RootNamespace>MyNUnit.Runner</RootNamespace>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <nullable>enable</nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NUnit" Version="3.12.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Attributes\Attributes.csproj" />
+    </ItemGroup>
+
+</Project>
