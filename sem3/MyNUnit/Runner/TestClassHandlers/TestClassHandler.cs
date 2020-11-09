@@ -1,12 +1,12 @@
 ﻿namespace MyNUnit.Runner.TestClassHandlers
 {
-    public abstract class TestClassHandler
+    public abstract class MyNUnitHandler
     {
-        public TestClassHandler? NextHandlerIfHandleSuccess { get; set; }
-        public TestClassHandler? NextHandlerIfHandleFailed { get; set; }
+        public MyNUnitHandler? NextHandlerIfHandleSuccess { get; set; }
+        public MyNUnitHandler? NextHandlerIfHandleFailed { get; set; }
 
-        protected TestClassHandler(TestClassHandler? nextHandlerIfHandleSuccess = null,
-            TestClassHandler? nextHandlerIfHandleFailed = null)
+        protected MyNUnitHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
+            MyNUnitHandler? nextHandlerIfHandleFailed = null)
         {
             NextHandlerIfHandleSuccess = nextHandlerIfHandleSuccess;
             NextHandlerIfHandleFailed = nextHandlerIfHandleFailed;

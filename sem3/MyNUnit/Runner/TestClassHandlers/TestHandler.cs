@@ -6,10 +6,10 @@ using MyNUnit.Runner.TestMethods;
 
 namespace MyNUnit.Runner.TestClassHandlers
 {
-    public class TestRunHandler : TestClassHandler
+    public class TestHandler : MyNUnitHandler
     {
-        public TestRunHandler(TestClassHandler? nextHandlerIfHandleSuccess = null,
-            TestClassHandler? nextHandlerIfHandleFailed = null)
+        public TestHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
+            MyNUnitHandler? nextHandlerIfHandleFailed = null)
             : base(nextHandlerIfHandleSuccess, nextHandlerIfHandleFailed)
         {
         }

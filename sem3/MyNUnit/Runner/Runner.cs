@@ -14,11 +14,11 @@ namespace MyNUnit.Runner
                 {
                     var afterClassHandler = new AfterClassHandler();
                     var beforeClassHandler = new BeforeClassHandler(nextHandlerIfHandleFailed: afterClassHandler);
-                    TestClassHandler currentHandler = beforeClassHandler;
+                    MyNUnitHandler currentHandler = beforeClassHandler;
                     for (var i = 0; i < testClass.TestMethodInfos.Count; i++)
                     {
                         var afterHandler = new AfterHandler();
-                        var testRunHandler = new TestRunHandler();
+                        var testRunHandler = new TestHandler();
                         currentHandler.NextHandlerIfHandleSuccess =
                             new BeforeHandler(testRunHandler, afterHandler);
                         testRunHandler.NextHandlerIfHandleSuccess = afterHandler;

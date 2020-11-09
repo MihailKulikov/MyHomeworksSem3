@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace MyNUnit.Runner.TestClassHandlers
 {
-    public class AfterHandler : TestClassHandler
+    public class AfterHandler : MyNUnitHandler
     {
-        public AfterHandler(TestClassHandler? nextHandlerIfHandleSuccess = null,
-            TestClassHandler? nextHandlerIfHandleFailed = null) :
+        public AfterHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
+            MyNUnitHandler? nextHandlerIfHandleFailed = null) :
             base(nextHandlerIfHandleSuccess, nextHandlerIfHandleFailed)
         {
         }
