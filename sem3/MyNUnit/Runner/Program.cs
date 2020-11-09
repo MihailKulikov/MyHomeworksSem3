@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace MyNUnit.Runner
 {
     internal static class Program
     {
-        private static void Main()
+        private static async Task Main()
         {
-            Console.WriteLine("Enter the path to the assemblies");
+            await new RunnerCli(new Runner(), Console.Out, Console.In, new AssemblyHandler()).Run();
         }
     }
 }

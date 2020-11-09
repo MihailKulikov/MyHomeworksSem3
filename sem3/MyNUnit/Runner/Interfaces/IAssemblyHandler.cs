@@ -4,6 +4,6 @@ namespace MyNUnit.Runner.Interfaces
 {
     public interface IAssemblyHandler
     {
-        IEnumerable<TestClassWrapper> TestClasses { get; }
+        IEnumerable<TestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies);
     }
 }

@@ -9,14 +9,7 @@ namespace MyNUnit.Runner
 {
     public class Runner : IRunner
     {
-        private readonly IEnumerable<TestClassWrapper> testClasses;
-
-        public Runner(IEnumerable<TestClassWrapper> testClasses)
-        {
-            this.testClasses = testClasses;
-        }
-
-        public IEnumerable<TestResult> RunTests() =>
+        public IEnumerable<TestResult> RunTests(IEnumerable<TestClassWrapper> testClasses) =>
             testClasses.AsParallel().Select(testClass =>
                 {
                     var afterClassHandler = new AfterClassHandler();

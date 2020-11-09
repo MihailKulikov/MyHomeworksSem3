@@ -4,6 +4,6 @@ namespace MyNUnit.Runner.Interfaces
 {
     public interface IRunner
     {
-        IEnumerable<TestResult> RunTests();
+        IEnumerable<TestResult> RunTests(IEnumerable<TestClassWrapper> testClasses);
     }
 }
