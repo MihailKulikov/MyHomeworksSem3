@@ -6,13 +6,20 @@ using MyNUnit.Runner.TestMethods;
 
 namespace MyNUnit.Runner.TestClassHandlers
 {
+    /// <summary>
+    /// Represents handler in chain for handling methods with test attribute.
+    /// </summary>
     public class TestHandler : MyNUnitHandler
     {
+        /// <summary>
+        /// Initialize a new instance of the <see cref="TestHandler"/> class with specified next handlers.
+        /// </summary>
+        /// <param name="nextHandlerIfHandleSuccess">A handler that will be called upon successful processing of this handler.</param>
+        /// <param name="nextHandlerIfHandleFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
         public TestHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
             MyNUnitHandler? nextHandlerIfHandleFailed = null)
             : base(nextHandlerIfHandleSuccess, nextHandlerIfHandleFailed)
-        {
-        }
+        { }
 
         protected override bool RunMethods(TestResult testResult, TestClassWrapper testClass)
         {
