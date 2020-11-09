@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace RunnerTests.Handlers
 {
-    public class BeforeAfterClassHandlerShould
+    public class BeforeAndAfterHandlerShould
     {
         private IMyNUnitHandler handler;
         private Mock<IMyNUnitHandler> successHandlerMock;

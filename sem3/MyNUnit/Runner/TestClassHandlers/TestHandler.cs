@@ -41,16 +41,17 @@ namespace MyNUnit.Runner.TestClassHandlers
                 stopwatch.Start();
                 testMethod.Invoke(testClass.TestClassInstance, null);
             }
-            catch (Exception e)
+            catch (TargetInvocationException e)
             {
+                var thrownException = e.GetBaseException();
                 stopwatch.Stop();
-                if (e.GetType() == attribute.Expected)
+                if (thrownException.GetType() == attribute.Expected)
                 {
                     testResult.TestMethods.Enqueue(new SuccessfulTestMethod(testMethod.Name, stopwatch.Elapsed));
                     return true;
                 }
 
-                testResult.TestMethods.Enqueue(new FailedTestMethod(testMethod.Name, e, attribute.Expected,
+                testResult.TestMethods.Enqueue(new FailedTestMethod(testMethod.Name, thrownException, attribute.Expected,
                     stopwatch.Elapsed));
                 return true;
             }
