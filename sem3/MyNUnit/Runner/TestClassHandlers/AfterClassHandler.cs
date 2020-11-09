@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using MyNUnit.Runner.Interfaces;
 
 namespace MyNUnit.Runner.TestClassHandlers
 {
@@ -13,22 +14,22 @@ namespace MyNUnit.Runner.TestClassHandlers
         /// </summary>
         /// <param name="nextHandlerIfHandlingWasSuccessful">A handler that will be called upon successful processing of this handler.</param>
         /// <param name="nextHandlerIfHandlingFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
-        public AfterClassHandler(MyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
-            MyNUnitHandler? nextHandlerIfHandlingFailed = null) : base(nextHandlerIfHandlingWasSuccessful,
+        public AfterClassHandler(IMyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
+            IMyNUnitHandler? nextHandlerIfHandlingFailed = null) : base(nextHandlerIfHandlingWasSuccessful,
             nextHandlerIfHandlingFailed)
         {
         }
 
-        protected override bool RunMethods(TestResult testResult, TestClassWrapper testClass)
+        protected override bool RunMethods(TestResult testResult, ITestClassWrapper testClass)
         {
             try
             {
                 Parallel.ForEach(testClass.AfterClassMethodInfos,
                     afterClassMethod => afterClassMethod.Invoke(null, null));
             }
-            catch (Exception e)
+            catch (AggregateException e)
             {
-                testResult.Exceptions.Enqueue(e);
+                testResult.Exceptions.Enqueue((e.InnerException?.InnerException ?? e.InnerException) ?? e);
                 return false;
             }
 

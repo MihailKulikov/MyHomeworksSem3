@@ -12,7 +12,7 @@ namespace MyNUnit.Runner
     /// </summary>
     public class Runner : IRunner
     {
-        public IEnumerable<TestResult> RunTests(IEnumerable<TestClassWrapper> testClasses) =>
+        public IEnumerable<TestResult> RunTests(IEnumerable<ITestClassWrapper> testClasses) =>
             testClasses.AsParallel().Select(testClass =>
                 {
                     var afterClassHandler = new AfterClassHandler();

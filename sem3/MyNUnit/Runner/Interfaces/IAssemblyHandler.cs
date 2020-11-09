@@ -11,7 +11,7 @@ namespace MyNUnit.Runner.Interfaces
         /// Gets test classes from assemblies in the specified directory.
         /// </summary>
         /// <param name="pathToAssemblies">Specified path to the directory that contains assemblies.</param>
-        /// <returns>Instances of the <see cref="TestClassWrapper"/> that represent test classes.</returns>
-        IEnumerable<TestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies);
+        /// <returns>Instances of the <see cref="ITestClassWrapper"/> that represent test classes.</returns>
+        IEnumerable<ITestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies);
     }
 }

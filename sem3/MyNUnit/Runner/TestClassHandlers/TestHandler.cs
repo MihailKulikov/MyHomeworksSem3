@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using MyNUnit.Attributes;
+using MyNUnit.Runner.Interfaces;
 using MyNUnit.Runner.TestMethods;
 
 namespace MyNUnit.Runner.TestClassHandlers
@@ -16,13 +17,13 @@ namespace MyNUnit.Runner.TestClassHandlers
         /// </summary>
         /// <param name="nextHandlerIfHandlingWasSuccessful">A handler that will be called upon successful processing of this handler.</param>
         /// <param name="nextHandlerIfHandlingFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
-        public TestHandler(MyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
-            MyNUnitHandler? nextHandlerIfHandlingFailed = null)
+        public TestHandler(IMyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
+            IMyNUnitHandler? nextHandlerIfHandlingFailed = null)
             : base(nextHandlerIfHandlingWasSuccessful, nextHandlerIfHandlingFailed)
         {
         }
 
-        protected override bool RunMethods(TestResult testResult, TestClassWrapper testClass)
+        protected override bool RunMethods(TestResult testResult, ITestClassWrapper testClass)
         {
             if (!testClass.TestMethodInfos.TryDequeue(out var testMethod)) return true;
             var attribute = testMethod.GetCustomAttribute<TestAttribute>()!;

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MyNUnit.Attributes;
+using MyNUnit.Runner.Interfaces;
 
 namespace MyNUnit.Runner
 {
     /// <summary>
     /// Represents test class in MyNUnit.
     /// </summary>
-    public class TestClassWrapper
+    public class TestClassWrapper : ITestClassWrapper
     {
         private readonly Lazy<object?> testClassLazyInstance;
 

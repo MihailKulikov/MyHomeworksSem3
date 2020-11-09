@@ -21,7 +21,7 @@ namespace MyNUnit.Runner
                 .Where(fileName => !currentAssemblies.Contains(fileName)).Select(Assembly.Load);
         }
 
-        public IEnumerable<TestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies)
+        public IEnumerable<ITestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies)
             => GetAssemblies(pathToAssemblies).AsParallel().SelectMany(assembly => assembly.ExportedTypes)
                 .Where(type => type.IsClass)
                 .Where(classType => classType.GetMethods().Any(info => info.GetCustomAttributes<TestAttribute>().Any()))
