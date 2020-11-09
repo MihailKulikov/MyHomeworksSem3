@@ -8,6 +8,9 @@ using MyNUnit.Runner.Interfaces;
 
 namespace MyNUnit.Runner
 {
+    /// <summary>
+    /// Represents implementation of the <see cref="IAssemblyHandler"/> interface.
+    /// </summary>
     public class AssemblyHandler : IAssemblyHandler
     {
         private static IEnumerable<Assembly> GetAssemblies(string pathToAssemblies)

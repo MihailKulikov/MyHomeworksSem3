@@ -12,14 +12,15 @@ namespace MyNUnit.Runner.TestClassHandlers
     public class TestHandler : MyNUnitHandler
     {
         /// <summary>
-        /// Initialize a new instance of the <see cref="TestHandler"/> class with specified next handlers.
+        /// Initializes a new instance of the <see cref="TestHandler"/> class with specified next handlers.
         /// </summary>
-        /// <param name="nextHandlerIfHandleSuccess">A handler that will be called upon successful processing of this handler.</param>
-        /// <param name="nextHandlerIfHandleFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
-        public TestHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
-            MyNUnitHandler? nextHandlerIfHandleFailed = null)
-            : base(nextHandlerIfHandleSuccess, nextHandlerIfHandleFailed)
-        { }
+        /// <param name="nextHandlerIfHandlingWasSuccessful">A handler that will be called upon successful processing of this handler.</param>
+        /// <param name="nextHandlerIfHandlingFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
+        public TestHandler(MyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
+            MyNUnitHandler? nextHandlerIfHandlingFailed = null)
+            : base(nextHandlerIfHandlingWasSuccessful, nextHandlerIfHandlingFailed)
+        {
+        }
 
         protected override bool RunMethods(TestResult testResult, TestClassWrapper testClass)
         {
@@ -54,7 +55,16 @@ namespace MyNUnit.Runner.TestClassHandlers
             }
 
             stopwatch.Stop();
-            testResult.TestMethods.Enqueue(new SuccessfulTestMethod(testMethod.Name, stopwatch.Elapsed));
+            if (attribute.Expected != null)
+            {
+                testResult.TestMethods.Enqueue(new FailedTestMethod(testMethod.Name, null, attribute.Expected,
+                    stopwatch.Elapsed));
+            }
+            else
+            {
+                testResult.TestMethods.Enqueue(new SuccessfulTestMethod(testMethod.Name, stopwatch.Elapsed));
+            }
+
             return true;
         }
     }

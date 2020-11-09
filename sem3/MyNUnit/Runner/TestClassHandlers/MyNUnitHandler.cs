@@ -8,20 +8,20 @@
         /// <summary>
         /// Gets and sets value of the next handler in chain if handling was successful.
         /// </summary>
-        public MyNUnitHandler? NextHandlerIfHandleSuccess { get; set; }
-        
+        public MyNUnitHandler? NextHandlerIfHandlingWasSuccessful { get; set; }
+
         /// <summary>
         /// Gets and sets value of the next handler in chain if handling failed.
         /// </summary>
-        public MyNUnitHandler? NextHandlerIfHandleFailed { get; set; }
+        public MyNUnitHandler? NextHandlerIfHandlingFailed { get; set; }
 
-        protected MyNUnitHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
-            MyNUnitHandler? nextHandlerIfHandleFailed = null)
+        protected MyNUnitHandler(MyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
+            MyNUnitHandler? nextHandlerIfHandlingFailed = null)
         {
-            NextHandlerIfHandleSuccess = nextHandlerIfHandleSuccess;
-            NextHandlerIfHandleFailed = nextHandlerIfHandleFailed;
+            NextHandlerIfHandlingWasSuccessful = nextHandlerIfHandlingWasSuccessful;
+            NextHandlerIfHandlingFailed = nextHandlerIfHandlingFailed;
         }
-        
+
         /// <summary>
         /// Handle request.
         /// </summary>
@@ -31,8 +31,8 @@
         public TestResult Handle(TestResult testResult, TestClassWrapper testClass)
         {
             return RunMethods(testResult, testClass)
-                ? NextHandlerIfHandleSuccess?.Handle(testResult, testClass) ?? testResult
-                : NextHandlerIfHandleFailed?.Handle(testResult, testClass) ?? testResult;
+                ? NextHandlerIfHandlingWasSuccessful?.Handle(testResult, testClass) ?? testResult
+                : NextHandlerIfHandlingFailed?.Handle(testResult, testClass) ?? testResult;
         }
 
         /// <summary>

@@ -9,13 +9,13 @@ namespace MyNUnit.Runner.TestClassHandlers
     public class BeforeHandler : MyNUnitHandler
     {
         /// <summary>
-        /// Initialize a new instance of the <see cref="BeforeHandler"/> class with specified next handlers.
+        /// Initializes a new instance of the <see cref="BeforeHandler"/> class with specified next handlers.
         /// </summary>
-        /// <param name="nextHandlerIfHandleSuccess"></param>
-        /// <param name="nextHandlerIfHandleFailed"></param>
-        public BeforeHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
-            MyNUnitHandler? nextHandlerIfHandleFailed = null)
-            : base(nextHandlerIfHandleSuccess, nextHandlerIfHandleFailed)
+        /// <param name="nextHandlerIfHandlingWasSuccessful">A handler that will be called upon successful processing of this handler.</param>
+        /// <param name="nextHandlerIfHandlingFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
+        public BeforeHandler(MyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
+            MyNUnitHandler? nextHandlerIfHandlingFailed = null)
+            : base(nextHandlerIfHandlingWasSuccessful, nextHandlerIfHandlingFailed)
         {
         }
 

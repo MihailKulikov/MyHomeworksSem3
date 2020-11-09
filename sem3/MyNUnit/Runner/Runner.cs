@@ -7,26 +7,18 @@ using MyNUnit.Runner.TestClassHandlers;
 
 namespace MyNUnit.Runner
 {
+    /// <summary>
+    /// Represents implementation of the <see cref="IRunner"/> interface.
+    /// </summary>
     public class Runner : IRunner
     {
         public IEnumerable<TestResult> RunTests(IEnumerable<TestClassWrapper> testClasses) =>
             testClasses.AsParallel().Select(testClass =>
                 {
                     var afterClassHandler = new AfterClassHandler();
-                    var beforeClassHandler = new BeforeClassHandler(nextHandlerIfHandleFailed: afterClassHandler);
-                    MyNUnitHandler currentHandler = beforeClassHandler;
-                    for (var i = 0; i < testClass.TestMethodInfos.Count; i++)
-                    {
-                        var afterHandler = new AfterHandler();
-                        var testRunHandler = new TestHandler();
-                        currentHandler.NextHandlerIfHandleSuccess =
-                            new BeforeHandler(testRunHandler, afterHandler);
-                        testRunHandler.NextHandlerIfHandleSuccess = afterHandler;
-                        currentHandler = afterHandler;
-                    }
-
-                    currentHandler.NextHandlerIfHandleFailed = afterClassHandler;
-                    currentHandler.NextHandlerIfHandleSuccess = afterClassHandler;
+                    var beforeClassHandler = new BeforeClassHandler(nextHandlerIfHandlingFailed: afterClassHandler);
+                    var multipleTestHandler = new MultipleBeforeTestAfterHandler(afterClassHandler);
+                    beforeClassHandler.NextHandlerIfHandlingWasSuccessful = multipleTestHandler;
 
                     return beforeClassHandler.Handle(new TestResult(testClass.ClassType.FullName ?? "",
                         new ConcurrentQueue<Exception>(), new ConcurrentQueue<ITestMethod>()), testClass);

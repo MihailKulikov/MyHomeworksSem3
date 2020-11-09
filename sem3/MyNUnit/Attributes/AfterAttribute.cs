@@ -7,5 +7,6 @@ namespace MyNUnit.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class AfterAttribute : Attribute
-    { }
+    {
+    }
 }

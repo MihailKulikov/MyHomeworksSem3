@@ -6,7 +6,7 @@
     public interface ITestMethod
     {
         /// <summary>
-        /// Gets name of the test.
+        /// Gets name of the test method.
         /// </summary>
         string Name { get; }
     }

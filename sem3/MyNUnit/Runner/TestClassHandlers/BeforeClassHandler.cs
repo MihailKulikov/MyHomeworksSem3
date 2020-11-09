@@ -3,11 +3,19 @@ using System.Threading.Tasks;
 
 namespace MyNUnit.Runner.TestClassHandlers
 {
+    /// <summary>
+    /// Represents handler in chain for handling methods with before class attribute.
+    /// </summary>
     public class BeforeClassHandler : MyNUnitHandler
     {
-        public BeforeClassHandler(MyNUnitHandler? nextHandlerIfHandleSuccess = null,
-            MyNUnitHandler? nextHandlerIfHandleFailed = null) : base(nextHandlerIfHandleSuccess,
-            nextHandlerIfHandleFailed)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BeforeClassHandler"/> class with specified next handlers.
+        /// </summary>
+        /// <param name="nextHandlerIfHandlingWasSuccessful">A handler that will be called upon successful processing of this handler.</param>
+        /// <param name="nextHandlerIfHandlingFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
+        public BeforeClassHandler(MyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
+            MyNUnitHandler? nextHandlerIfHandlingFailed = null) : base(nextHandlerIfHandlingWasSuccessful,
+            nextHandlerIfHandlingFailed)
         {
         }
 
