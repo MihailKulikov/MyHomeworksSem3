@@ -58,7 +58,7 @@ namespace MyNUnit.Runner
                 await textWriter.WriteLineAsync(ExceptionMessage);
                 foreach (var exception in result.Exceptions)
                 {
-                    Console.WriteLine(exception.ToString());
+                    await textWriter.WriteLineAsync(exception.ToString());
                 }
 
                 foreach (var testMethod in result.TestMethods)

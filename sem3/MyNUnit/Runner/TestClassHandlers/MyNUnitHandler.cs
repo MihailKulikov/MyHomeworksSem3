@@ -30,12 +30,10 @@ namespace MyNUnit.Runner.TestClassHandlers
         /// <param name="testResult">Contains useful information about the tests being run.</param>
         /// <param name="testClass">Contains test, before, after, beforeClass, afterClass methods being run in this launch.</param>
         /// <returns>Contains updated information about the tests being run.</returns>
-        public TestResult Handle(TestResult testResult, ITestClassWrapper testClass)
-        {
-            return RunMethods(testResult, testClass)
+        public TestResult Handle(TestResult testResult, ITestClassWrapper testClass) =>
+            RunMethods(testResult, testClass)
                 ? NextHandlerIfHandlingWasSuccessful?.Handle(testResult, testClass) ?? testResult
                 : NextHandlerIfHandlingFailed?.Handle(testResult, testClass) ?? testResult;
-        }
 
         /// <summary>
         /// Determines the success of the handler processing.
