@@ -21,7 +21,6 @@ namespace RunnerTests.Handlers
         private volatile int afterHandleCallsNumber;
         private volatile int beforeHandleCallsNumber;
         private volatile int testHandleCallsNumber;
-        private static readonly Exception Exception = new Exception();
 
         public void Before()
         {

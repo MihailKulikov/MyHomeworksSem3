@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using MyNUnit.Runner.Interfaces;
@@ -15,7 +14,7 @@ namespace MyNUnit.Runner
         private const string IntroduceMessage = "Enter the path to the assemblies:";
 
         private const string ExceptionMessage =
-            "The following exceptions were thrown in the After, AfterClass, Before, BeforeClass blocks";
+            "The following exceptions were thrown in the After, AfterClass, Before, BeforeClass blocks:";
 
         private readonly IRunner runner;
         private readonly TextWriter textWriter;
@@ -47,7 +46,18 @@ namespace MyNUnit.Runner
         {
             await textWriter.WriteLineAsync(IntroduceMessage);
             string path = (await textReader.ReadLineAsync())!;
-            await WriteResults(runner.RunTests(assemblyHandler.GetTestClassesFromAssemblies(path)));
+            IEnumerable<ITestClassWrapper> testClasses;
+            try
+            {
+                testClasses = assemblyHandler.GetTestClassesFromAssemblies(path);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                await textWriter.WriteLineAsync("Directory not found.");
+                return;
+            }
+            
+            await WriteResults(runner.RunTests(testClasses));
         }
 
         private async Task WriteResults(IEnumerable<TestResult> results)
@@ -55,10 +65,14 @@ namespace MyNUnit.Runner
             foreach (var result in results)
             {
                 await textWriter.WriteLineAsync(result.ClassName);
-                await textWriter.WriteLineAsync(ExceptionMessage);
+
+                if (!result.Exceptions.IsEmpty)
+                {
+                    await textWriter.WriteLineAsync($"\t{ExceptionMessage}");
+                }
                 foreach (var exception in result.Exceptions)
                 {
-                    await textWriter.WriteLineAsync(exception.ToString());
+                    await textWriter.WriteLineAsync($"\t{exception}");
                 }
 
                 foreach (var testMethod in result.TestMethods)
@@ -74,7 +88,7 @@ namespace MyNUnit.Runner
             {
                 case IgnoredTestMethod ignoredTestMethod:
                     await textWriter.WriteLineAsync(
-                        $"{ignoredTestMethod.Name} was ignored because of {ignoredTestMethod.ReasonForIgnoring}");
+                        $"\t{ignoredTestMethod.Name} was ignored because of {ignoredTestMethod.ReasonForIgnoring}");
                     break;
                 case FailedTestMethod failedTestMethod:
                 {
@@ -83,34 +97,34 @@ namespace MyNUnit.Runner
                         if (failedTestMethod.ThrownException == null)
                         {
                             await textWriter.WriteLineAsync(
-                                $"{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:" +
+                                $"\t{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:" +
                                 $" expected {failedTestMethod.ExpectedExceptionType}," +
                                 " but no exceptions were thrown.");
                         }
                         else
                         {
                             await textWriter.WriteLineAsync(
-                                $"{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:" +
+                                $"\t{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:" +
                                 $" expected {failedTestMethod.ExpectedExceptionType}," +
                                 $" but was {failedTestMethod.ThrownException.GetType()}");
 
                             await textWriter.WriteLineAsync(
-                                $"Stack trace: {failedTestMethod.ThrownException.StackTrace}");
+                                $"\tStack trace: {failedTestMethod.ThrownException.StackTrace}");
                         }
                     }
                     else
                     {
                         await textWriter.WriteLineAsync(
-                            $"{failedTestMethod.Name}: {failedTestMethod.ThrownException!.GetType()} was thrown.");
+                            $"\t{failedTestMethod.Name}: {failedTestMethod.ThrownException!.GetType()} was thrown.");
 
-                        await textWriter.WriteLineAsync($"Stack trace: {failedTestMethod.ThrownException.StackTrace}");
+                        await textWriter.WriteLineAsync($"\tStack trace: {failedTestMethod.ThrownException.StackTrace}");
                     }
 
                     break;
                 }
                 case SuccessfulTestMethod successfulTestMethod:
                     await textWriter.WriteLineAsync(
-                        $"{successfulTestMethod.Name} was successful within {successfulTestMethod.ElapsedTime}");
+                        $"\t{successfulTestMethod.Name} passed in {successfulTestMethod.ElapsedTime}");
                     break;
             }
         }

@@ -10,9 +10,21 @@ namespace TestProject
         {
             Console.WriteLine("Hello, boi!");
         }
+
+        [Test]
+        public void ThrowException()
+        {
+            throw new Exception("haha");
+        }
+
+        [Test(Expected = typeof(AggregateException))]
+        public void ThrowUnexpectedException()
+        {
+            throw new ArgumentException();
+        }
         
         [Test(Expected = typeof(Exception))]
-        public void MeToo()
+        public void ThrowExpectedException()
         {
             throw new Exception("Haha");
         }
@@ -21,6 +33,14 @@ namespace TestProject
         public void DontTestMe()
         {
             //
+        }
+    }
+
+    public class AnotherOne
+    {
+        [Test]
+        public void TestMe()
+        {
         }
     }
 }

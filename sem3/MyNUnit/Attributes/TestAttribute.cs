@@ -8,27 +8,11 @@ namespace MyNUnit.Attributes
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class TestAttribute : Attribute
     {
-        private Type? expected;
-
         /// <summary>
         /// Expected type of exception.
         /// </summary>
         /// <exception cref="ArgumentException">The class type does not inherit from the <see cref="Exception"/> type.</exception>
-        public Type? Expected
-        {
-            get => expected;
-            set
-            {
-                if (value == null || value.IsSubclassOf(typeof(Exception)))
-                {
-                    expected = value;
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-        }
+        public Type? Expected { get; set; }
 
         /// <summary>
         /// Reason for canceling the test run.

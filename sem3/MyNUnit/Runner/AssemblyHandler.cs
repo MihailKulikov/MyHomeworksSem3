@@ -13,16 +13,24 @@ namespace MyNUnit.Runner
     /// </summary>
     public class AssemblyHandler : IAssemblyHandler
     {
-        private static IEnumerable<Assembly> GetAssemblies(string pathToAssemblies)
-        {
-            var currentAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Select(assembly => assembly.FullName);
-            return Directory.EnumerateFiles(pathToAssemblies, "*.dll").AsParallel()
-                .Where(fileName => !currentAssemblies.Contains(fileName)).Select(Assembly.Load);
-        }
+        private static IEnumerable<Assembly> GetAssemblies(string pathToAssemblies) =>
+            Directory.EnumerateFiles(pathToAssemblies, "*.dll")
+                .Select(addInAssembly =>
+                {
+                    try
+                    {
+                        return Assembly.LoadFrom(addInAssembly!);
+                    }
+                    catch (Exception)
+                    {
+                        return null;
+                    }
+                })
+                .Where(addInAssembly => addInAssembly != null)
+                .Select(addInAssembly => addInAssembly!);
 
-        public IEnumerable<ITestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies)
-            => GetAssemblies(pathToAssemblies).AsParallel().SelectMany(assembly => assembly.ExportedTypes)
+        public IEnumerable<ITestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies) =>
+            GetAssemblies(pathToAssemblies).SelectMany(assembly => assembly.ExportedTypes)
                 .Where(type => type.IsClass)
                 .Where(classType => classType.GetMethods().Any(info => info.GetCustomAttributes<TestAttribute>().Any()))
                 .Select(classType => new TestClassWrapper(classType));
