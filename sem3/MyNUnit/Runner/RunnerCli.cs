@@ -16,6 +16,8 @@ namespace MyNUnit.Runner
         private const string ExceptionMessage =
             "The following exceptions were thrown in the After, AfterClass, Before, BeforeClass blocks:";
 
+        private const string DirectoryNotFoundMessage = "Directory not found.";
+
         private readonly IRunner runner;
         private readonly TextWriter textWriter;
         private readonly TextReader textReader;
@@ -53,7 +55,7 @@ namespace MyNUnit.Runner
             }
             catch (DirectoryNotFoundException)
             {
-                await textWriter.WriteLineAsync("Directory not found.");
+                await textWriter.WriteLineAsync(DirectoryNotFoundMessage);
                 return;
             }
             
@@ -97,27 +99,24 @@ namespace MyNUnit.Runner
                         if (failedTestMethod.ThrownException == null)
                         {
                             await textWriter.WriteLineAsync(
-                                $"\t{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:" +
-                                $" expected {failedTestMethod.ExpectedExceptionType}," +
-                                " but no exceptions were thrown.");
+                                $"\t{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:"
+                                + $" expected {failedTestMethod.ExpectedExceptionType},"
+                                + $" but no exceptions were thrown.");
                         }
                         else
                         {
                             await textWriter.WriteLineAsync(
-                                $"\t{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:" +
-                                $" expected {failedTestMethod.ExpectedExceptionType}," +
-                                $" but was {failedTestMethod.ThrownException.GetType()}");
-
-                            await textWriter.WriteLineAsync(
-                                $"\tStack trace: {failedTestMethod.ThrownException.StackTrace}");
+                                $"\t{failedTestMethod.Name} {failedTestMethod.ElapsedTime}" 
+                                + $" expected {failedTestMethod.ExpectedExceptionType},"
+                                + $" but was {failedTestMethod.ThrownException.GetType()}\n"
+                                + $"\tStack trace: {failedTestMethod.ThrownException.StackTrace}");
                         }
                     }
                     else
                     {
                         await textWriter.WriteLineAsync(
-                            $"\t{failedTestMethod.Name}: {failedTestMethod.ThrownException!.GetType()} was thrown.");
-
-                        await textWriter.WriteLineAsync($"\tStack trace: {failedTestMethod.ThrownException.StackTrace}");
+                            $"\t{failedTestMethod.Name}: {failedTestMethod.ThrownException!.GetType()} was thrown.\n"
+                            + $"\tStack trace: {failedTestMethod.ThrownException.StackTrace}");
                     }
 
                     break;
