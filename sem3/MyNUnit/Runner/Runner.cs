@@ -13,15 +13,15 @@ namespace MyNUnit.Runner
     public class Runner : IRunner
     {
         public IEnumerable<TestResult> RunTests(IEnumerable<ITestClassWrapper> testClasses) =>
-            testClasses.AsParallel().Select(testClass =>
+            testClasses.Select(testClass =>
                 {
                     var afterClassHandler = new AfterClassHandler();
                     var beforeClassHandler = new BeforeClassHandler(nextHandlerIfHandlingFailed: afterClassHandler);
                     var multipleTestHandler = new MultipleBeforeTestAfterHandler(afterClassHandler);
                     beforeClassHandler.NextHandlerIfHandlingWasSuccessful = multipleTestHandler;
-
-                    return beforeClassHandler.Handle(new TestResult(testClass.ClassType.FullName ?? "",
+                    var result = beforeClassHandler.Handle(new TestResult(testClass.ClassType.FullName ?? "",
                         new ConcurrentQueue<Exception>(), new ConcurrentQueue<ITestMethod>()), testClass);
+                    return result;
                 }
             );
     }
