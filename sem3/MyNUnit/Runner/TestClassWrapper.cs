@@ -32,7 +32,10 @@ namespace MyNUnit.Runner
             AfterMethodInfos = classType.GetMethods()
                 .Where(info => info.GetCustomAttributes<AfterAttribute>().Any());
             TestMethodInfos = new ConcurrentQueue<MethodInfo>(classType.GetMethods()
-                .Where(info => info.GetCustomAttributes<TestAttribute>().Any()));
+                .Where(info => info.GetCustomAttributes<TestAttribute>().Any())
+                .Where(info => info.GetParameters().Length == 0)
+                .Where(info => info.ReturnType == typeof(void))
+                .Where(info => !info.IsStatic));
 
             testClassInstances = new ConcurrentQueue<object?>();
             Parallel.For(0, TestMethodInfos.Count,
