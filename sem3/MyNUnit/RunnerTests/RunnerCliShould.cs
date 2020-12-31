@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Moq;
 using MyNUnit.Runner;
 using MyNUnit.Runner.Interfaces;
@@ -15,7 +16,6 @@ namespace RunnerTests
         private RunnerCli cli;
         private Mock<IRunner> runnerMock;
         private Mock<TextWriter> textWriterMock;
-        private Mock<TextReader> textReaderMock;
         private Mock<IAssemblyHandler> assemblyHandlerMock;
         private const string DirectoryNotFoundMessage = "Directory not found.";
         private const string IntroduceMessage = "Enter the path to the assemblies:";
@@ -46,8 +46,6 @@ namespace RunnerTests
         private void SimpleVerify()
         {
             textWriterMock.VerifyNoOtherCalls();
-            textReaderMock.Verify();
-            textReaderMock.VerifyNoOtherCalls();
             assemblyHandlerMock.Verify();
             assemblyHandlerMock.VerifyNoOtherCalls();
             runnerMock.Verify();
@@ -59,20 +57,18 @@ namespace RunnerTests
         {
             runnerMock = new Mock<IRunner>();
             textWriterMock = new Mock<TextWriter>();
-            textReaderMock = new Mock<TextReader>();
             assemblyHandlerMock = new Mock<IAssemblyHandler>();
-            cli = new RunnerCli(runnerMock.Object, textWriterMock.Object, textReaderMock.Object,
+            cli = new RunnerCli(runnerMock.Object, textWriterMock.Object,
                 assemblyHandlerMock.Object);
         }
 
         [Test]
-        public void Write_That_Directory_Not_Found_Then_AssemblyHandler_Throw_DirectoryNotFoundException()
+        public async Task Write_That_Directory_Not_Found_Then_AssemblyHandler_Throw_DirectoryNotFoundException()
         {
-            textReaderMock.Setup(reader => reader.ReadLineAsync()).ReturnsAsync(Path).Verifiable();
             assemblyHandlerMock.Setup(handler => handler.GetTestClassesFromAssemblies(Path))
                 .Throws<DirectoryNotFoundException>().Verifiable();
 
-            cli.Run();
+            await cli.Run(Path);
 
             textWriterMock.Verify(writer => writer.WriteLineAsync(DirectoryNotFoundMessage), Times.Once);
             textWriterMock.Verify(writer => writer.WriteLineAsync(IntroduceMessage), Times.Once);
@@ -80,10 +76,9 @@ namespace RunnerTests
         }
 
         [Test]
-        public void Write_About_Exceptions_Thrown_During_Test_Execution()
+        public async Task Write_About_Exceptions_Thrown_During_Test_Execution()
         {
             var testClassWrappers = new[] {It.IsAny<ITestClassWrapper>()};
-            textReaderMock.Setup(reader => reader.ReadLineAsync()).ReturnsAsync(Path).Verifiable();
             assemblyHandlerMock.Setup(handler => handler.GetTestClassesFromAssemblies(Path))
                 .Returns(testClassWrappers).Verifiable();
             runnerMock.Setup(runner => runner.RunTests(testClassWrappers)).Returns(new[]
@@ -92,7 +87,7 @@ namespace RunnerTests
                     new ConcurrentQueue<ITestMethod>())
             }).Verifiable();
 
-            cli.Run();
+            await cli.Run(Path);
 
             textWriterMock.Verify(writer => writer.WriteLineAsync(TestClassName), Times.Once);
             textWriterMock.Verify(writer => writer.WriteLineAsync(IntroduceMessage), Times.Once);
@@ -103,11 +98,10 @@ namespace RunnerTests
 
         [TestCaseSource(nameof(TestMethodCases))]
         [Test]
-        public void Write_Info_About_Test_Method((ITestMethod testMethod, string expectedMessage) testMethodCase)
+        public async Task Write_Info_About_Test_Method((ITestMethod testMethod, string expectedMessage) testMethodCase)
         {
             var (testMethod, expectedMessage) = testMethodCase;
             var testClassWrappers = new[] {It.IsAny<ITestClassWrapper>()};
-            textReaderMock.Setup(reader => reader.ReadLineAsync()).ReturnsAsync(Path).Verifiable();
             assemblyHandlerMock.Setup(handler => handler.GetTestClassesFromAssemblies(Path)).Returns(testClassWrappers)
                 .Verifiable();
             runnerMock.Setup(runner => runner.RunTests(testClassWrappers)).Returns(new[]
@@ -116,7 +110,7 @@ namespace RunnerTests
                     new ConcurrentQueue<ITestMethod>(new[] {testMethod}))
             }).Verifiable();
 
-            cli.Run();
+            await cli.Run(Path);
 
             textWriterMock.Verify(writer => writer.WriteLineAsync(TestClassName), Times.Once);
             textWriterMock.Verify(writer => writer.WriteLineAsync(IntroduceMessage), Times.Once);

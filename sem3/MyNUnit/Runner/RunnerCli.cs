@@ -20,7 +20,6 @@ namespace MyNUnit.Runner
 
         private readonly IRunner runner;
         private readonly TextWriter textWriter;
-        private readonly TextReader textReader;
         private readonly IAssemblyHandler assemblyHandler;
 
         /// <summary>
@@ -30,13 +29,11 @@ namespace MyNUnit.Runner
         /// </summary>
         /// <param name="runner">Specified instance of the <see cref="IRunner"/>.</param>
         /// <param name="textWriter">Specified instance of the <see cref="TextWriter"/>.</param>
-        /// <param name="textReader">Specified instance of the <see cref="TextReader"/>.</param>
         /// <param name="assemblyHandler">Specified instance of the <see cref="IAssemblyHandler"/>.</param>
-        public RunnerCli(IRunner runner, TextWriter textWriter, TextReader textReader, IAssemblyHandler assemblyHandler)
+        public RunnerCli(IRunner runner, TextWriter textWriter, IAssemblyHandler assemblyHandler)
         {
             this.runner = runner;
             this.textWriter = textWriter;
-            this.textReader = textReader;
             this.assemblyHandler = assemblyHandler;
         }
 
@@ -44,10 +41,9 @@ namespace MyNUnit.Runner
         /// Launches CLI.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public async Task Run()
+        public async Task Run(string path)
         {
             await textWriter.WriteLineAsync(IntroduceMessage);
-            string path = (await textReader.ReadLineAsync())!;
             IEnumerable<ITestClassWrapper> testClasses;
             try
             {
@@ -101,7 +97,7 @@ namespace MyNUnit.Runner
                             await textWriter.WriteLineAsync(
                                 $"\t{failedTestMethod.Name} {failedTestMethod.ElapsedTime}:"
                                 + $" expected {failedTestMethod.ExpectedExceptionType},"
-                                + $" but no exceptions were thrown.");
+                                + " but no exceptions were thrown.");
                         }
                         else
                         {
