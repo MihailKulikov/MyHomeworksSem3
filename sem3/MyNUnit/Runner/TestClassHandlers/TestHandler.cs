@@ -24,7 +24,10 @@ namespace MyNUnit.Runner.TestClassHandlers
 
         protected override bool RunMethods(TestResult testResult, ITestClassWrapper testClass)
         {
-            if (!testClass.TestMethodInfos.TryDequeue(out var testMethod)) return true;
+            if (!testClass.TestMethodInfos.TryDequeue(out var testMethod))
+            {
+                return true;
+            }
             var attribute = testMethod.GetCustomAttribute<TestAttribute>()!;
             if (attribute.Ignore != null)
             {
