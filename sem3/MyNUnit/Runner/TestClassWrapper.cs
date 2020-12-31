@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using MyNUnit.Attributes;
 using MyNUnit.Runner.Interfaces;
 
@@ -13,7 +14,7 @@ namespace MyNUnit.Runner
     /// </summary>
     public class TestClassWrapper : ITestClassWrapper
     {
-        private readonly Lazy<object?> testClassLazyInstance;
+        private readonly ConcurrentQueue<object?> testClassInstances;
 
         /// <summary>
         /// Initialize a new instance of the <see cref="TestClassWrapper"/> class which is a wrapper for a test class of the specified type. 
@@ -22,8 +23,6 @@ namespace MyNUnit.Runner
         public TestClassWrapper(Type classType)
         {
             ClassType = classType;
-            testClassLazyInstance =
-                new Lazy<object?>(() => Activator.CreateInstance(ClassType), true);
             BeforeClassMethodInfos = classType.GetMethods().Where(info =>
                 info.GetCustomAttributes<BeforeClassAttribute>().Any() && info.IsStatic);
             AfterClassMethodInfos = classType.GetMethods().Where(info =>
@@ -34,12 +33,17 @@ namespace MyNUnit.Runner
                 .Where(info => info.GetCustomAttributes<AfterAttribute>().Any());
             TestMethodInfos = new ConcurrentQueue<MethodInfo>(classType.GetMethods()
                 .Where(info => info.GetCustomAttributes<TestAttribute>().Any()));
+
+            testClassInstances = new ConcurrentQueue<object?>();
+            Parallel.For(0, TestMethodInfos.Count,
+                num => { testClassInstances.Enqueue(Activator.CreateInstance(classType)); });
         }
 
         /// <summary>
         /// Gets test class instance.
         /// </summary>
-        public object? TestClassInstance => testClassLazyInstance.Value;
+        public object? TestClassInstance =>
+            testClassInstances.TryDequeue(out var testClassInstance) ? testClassInstance : null;
 
         /// <summary>
         /// Gets test class type.
