@@ -24,8 +24,10 @@ namespace MyNUnit.Runner.TestClassHandlers
         {
             try
             {
-                Parallel.ForEach(testClass.AfterMethodInfos,
-                    afterMethod => afterMethod.Invoke(testClass.TestClassInstance, null));
+                foreach (var afterMethod in testClass.AfterMethodInfos)
+                {
+                    afterMethod.Invoke(testClass.TestClassInstance, null);
+                }
             }
             catch (Exception e)
             {
