@@ -15,6 +15,7 @@ namespace MyNUnit.Runner
     {
         private static IEnumerable<Assembly> GetAssemblies(string pathToAssemblies) =>
             Directory.EnumerateFiles(pathToAssemblies, "*.dll")
+                .AsParallel()
                 .Select(addInAssembly =>
                 {
                     try
@@ -31,6 +32,7 @@ namespace MyNUnit.Runner
 
         public IEnumerable<ITestClassWrapper> GetTestClassesFromAssemblies(string pathToAssemblies) =>
             GetAssemblies(pathToAssemblies).SelectMany(assembly => assembly.ExportedTypes)
+                .AsParallel()
                 .Where(type => type.IsClass)
                 .Where(classType => classType.GetMethods().Any(info => info.GetCustomAttributes<TestAttribute>().Any()))
                 .Select(classType => new TestClassWrapper(classType));
