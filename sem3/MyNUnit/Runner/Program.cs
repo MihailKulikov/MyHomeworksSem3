@@ -9,7 +9,7 @@ namespace MyNUnit.Runner
         {
             if (args.Length != 1)
             {
-                Console.WriteLine("Incorrect number of arguments.");
+                Console.WriteLine("You must enter the path to the directory with tests as a command line argument.");
                 return;
             }
             
