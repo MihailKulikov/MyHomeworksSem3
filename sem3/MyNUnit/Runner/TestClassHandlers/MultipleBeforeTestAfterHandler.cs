@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MyNUnit.Runner.Interfaces;
 
 namespace MyNUnit.Runner.TestClassHandlers
@@ -24,9 +25,10 @@ namespace MyNUnit.Runner.TestClassHandlers
             var testCount = testClass.TestMethodInfos.Count;
             Parallel.For(0, testCount, index =>
             {
-                var testHandler = new TestHandler();
-                var beforeHandler = new BeforeHandler();
-                var afterHandler = new AfterHandler();
+                var testClassInstance = Activator.CreateInstance(testClass.ClassType);
+                var testHandler = new TestHandler(testClassInstance);
+                var beforeHandler = new BeforeHandler(testClassInstance);
+                var afterHandler = new AfterHandler(testClassInstance);
                 testHandler.NextHandlerIfHandlingWasSuccessful = afterHandler;
                 beforeHandler.NextHandlerIfHandlingWasSuccessful = testHandler;
                 beforeHandler.NextHandlerIfHandlingFailed = afterHandler;

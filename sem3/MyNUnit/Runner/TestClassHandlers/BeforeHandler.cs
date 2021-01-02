@@ -9,15 +9,19 @@ namespace MyNUnit.Runner.TestClassHandlers
     /// </summary>
     public class BeforeHandler : MyNUnitHandler
     {
+        private readonly object? testClassInstance;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BeforeHandler"/> class with specified next handlers.
         /// </summary>
+        /// <param name="testClassInstance">Test class instance to which the method will be applied.</param>
         /// <param name="nextHandlerIfHandlingWasSuccessful">A handler that will be called upon successful processing of this handler.</param>
         /// <param name="nextHandlerIfHandlingFailed">A handler that will be called upon unsuccessful processing of this handler.</param>
-        public BeforeHandler(IMyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
+        public BeforeHandler(object? testClassInstance, IMyNUnitHandler? nextHandlerIfHandlingWasSuccessful = null,
             IMyNUnitHandler? nextHandlerIfHandlingFailed = null)
             : base(nextHandlerIfHandlingWasSuccessful, nextHandlerIfHandlingFailed)
         {
+            this.testClassInstance = testClassInstance;
         }
 
         protected override bool RunMethods(TestResult testResult, ITestClassWrapper testClass)
@@ -25,7 +29,7 @@ namespace MyNUnit.Runner.TestClassHandlers
             try
             {
                 Parallel.ForEach(testClass.BeforeMethodInfos,
-                    beforeMethod => beforeMethod.Invoke(testClass.TestClassInstance, null));
+                    beforeMethod => beforeMethod.Invoke(testClassInstance, null));
             }
             catch (Exception e)
             {

@@ -18,7 +18,6 @@ namespace RunnerTests
         private Mock<TextWriter> textWriterMock;
         private Mock<IAssemblyHandler> assemblyHandlerMock;
         private const string DirectoryNotFoundMessage = "Directory not found.";
-        private const string IntroduceMessage = "Enter the path to the assemblies:";
         private const string Path = "Something";
         private const string TestClassName = "Name";
 
@@ -71,7 +70,6 @@ namespace RunnerTests
             await cli.Run(Path);
 
             textWriterMock.Verify(writer => writer.WriteLineAsync(DirectoryNotFoundMessage), Times.Once);
-            textWriterMock.Verify(writer => writer.WriteLineAsync(IntroduceMessage), Times.Once);
             SimpleVerify();
         }
 
@@ -90,7 +88,6 @@ namespace RunnerTests
             await cli.Run(Path);
 
             textWriterMock.Verify(writer => writer.WriteLineAsync(TestClassName), Times.Once);
-            textWriterMock.Verify(writer => writer.WriteLineAsync(IntroduceMessage), Times.Once);
             textWriterMock.Verify(writer => writer.WriteLineAsync('\t' + ExceptionMessage), Times.Once);
             textWriterMock.Verify(writer => writer.WriteLineAsync('\t' + new Exception().ToString()), Times.Once);
             SimpleVerify();
@@ -113,7 +110,6 @@ namespace RunnerTests
             await cli.Run(Path);
 
             textWriterMock.Verify(writer => writer.WriteLineAsync(TestClassName), Times.Once);
-            textWriterMock.Verify(writer => writer.WriteLineAsync(IntroduceMessage), Times.Once);
             textWriterMock.Verify(
                 writer => writer.WriteLineAsync(expectedMessage),
                 Times.Once);

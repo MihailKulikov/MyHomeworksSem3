@@ -21,23 +21,23 @@ namespace RunnerTests.Handlers
         private TestResult testResult;
         private static int count;
         private static readonly Exception Exception = new Exception();
+        private static object testClassInstance;
 
         private static
             IEnumerable<(Func<IMyNUnitHandler, IMyNUnitHandler, IMyNUnitHandler> initializeHandler,
-                Expression<Func<ITestClassWrapper, IEnumerable<MethodInfo>>> getMethods,
-                Times testClassInitializationNumber)> BeforeOrAfterClassCase
+                Expression<Func<ITestClassWrapper, IEnumerable<MethodInfo>>> getMethods)> BeforeOrAfterClassCase
         {
             get
             {
                 yield return (
                     (successfulHandler, failHandler) => new BeforeClassHandler(successfulHandler, failHandler),
-                    testClass => testClass.BeforeClassMethodInfos, Times.Never());
+                    testClass => testClass.BeforeClassMethodInfos);
                 yield return ((successfulHandler, failHandler) => new AfterClassHandler(successfulHandler, failHandler),
-                    testClass => testClass.AfterClassMethodInfos, Times.Never());
-                yield return ((successfulHandler, failHandler) => new BeforeHandler(successfulHandler, failHandler),
-                    testClass => testClass.BeforeMethodInfos, Times.Once());
-                yield return ((successfulHandler, failHandler) => new AfterHandler(successfulHandler, failHandler),
-                    testClass => testClass.AfterMethodInfos, Times.Once());
+                    testClass => testClass.AfterClassMethodInfos);
+                yield return ((successfulHandler, failHandler) => new BeforeHandler(testClassInstance, successfulHandler, failHandler),
+                    testClass => testClass.BeforeMethodInfos);
+                yield return ((successfulHandler, failHandler) => new AfterHandler(testClassInstance, successfulHandler, failHandler),
+                    testClass => testClass.AfterMethodInfos);
             }
         }
 
@@ -54,6 +54,7 @@ namespace RunnerTests.Handlers
         [SetUp]
         public void SetUp()
         {
+            testClassInstance = Activator.CreateInstance(GetType());
             count = 0;
             testResult = new TestResult("Something", new ConcurrentQueue<Exception>(),
                 new ConcurrentQueue<ITestMethod>());
@@ -66,10 +67,9 @@ namespace RunnerTests.Handlers
         [Test]
         public void Call_Handle_Method_Of_Success_Handler_If_Processing_Was_Success(
             (Func<IMyNUnitHandler, IMyNUnitHandler, IMyNUnitHandler> initializeHandler,
-                Expression<Func<ITestClassWrapper, IEnumerable<MethodInfo>>> getMethods,
-                Times testClassInitializationNumber) testCase)
+                Expression<Func<ITestClassWrapper, IEnumerable<MethodInfo>>> getMethods) testCase)
         {
-            var (initializeHandler, getMethods, testClassInitializationNumber) = testCase;
+            var (initializeHandler, getMethods) = testCase;
             handler = initializeHandler!(successHandlerMock.Object, failHandlerMock.Object);
             testClassMock.Setup(getMethods)
                 .Returns(new[] {GetType().GetMethod(nameof(IncrementGlobalParameter))}).Verifiable();
@@ -77,7 +77,6 @@ namespace RunnerTests.Handlers
             var actualTestResult = handler.Handle(testResult, testClassMock.Object);
 
             Assert.That(count, Is.EqualTo(1));
-            testClassMock.Verify(testClass => testClass.TestClassInstance, testClassInitializationNumber);
             testClassMock.Verify();
             testClassMock.VerifyNoOtherCalls();
             successHandlerMock.Verify(successHandler => successHandler.Handle(testResult, testClassMock.Object),
@@ -92,10 +91,9 @@ namespace RunnerTests.Handlers
         [Test]
         public void Call_Handle_Method_Of_Fail_Handler_And_Collect_Exception_If_Handling_Failed(
             (Func<IMyNUnitHandler, IMyNUnitHandler, IMyNUnitHandler> initializeHandler,
-                Expression<Func<ITestClassWrapper, IEnumerable<MethodInfo>>> getMethods,
-                Times testClassInitializationNumber) testCase)
+                Expression<Func<ITestClassWrapper, IEnumerable<MethodInfo>>> getMethods) testCase)
         {
-            var (initializeHandler, getMethods, testClassInitializationNumber) = testCase;
+            var (initializeHandler, getMethods) = testCase;
             handler = initializeHandler(successHandlerMock.Object, failHandlerMock.Object);
             var expectedExceptions = new ConcurrentQueue<Exception>();
             expectedExceptions.Enqueue(Exception);
@@ -105,7 +103,6 @@ namespace RunnerTests.Handlers
             var actualTestResult = handler.Handle(testResult, testClassMock.Object);
 
             testClassMock.Verify();
-            testClassMock.Verify(testClass => testClass.TestClassInstance, testClassInitializationNumber);
             testClassMock.VerifyNoOtherCalls();
             successHandlerMock.VerifyNoOtherCalls();
             failHandlerMock.Verify(failHandler => failHandler.Handle(testResult, testClassMock.Object), Times.Once);

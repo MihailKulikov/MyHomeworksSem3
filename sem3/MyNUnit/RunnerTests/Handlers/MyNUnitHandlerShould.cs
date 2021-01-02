@@ -10,20 +10,15 @@ namespace RunnerTests.Handlers
     {
         private MyNUnitHandler handler;
 
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         private static IEnumerable<Func<MyNUnitHandler>> FactoryWithoutArguments
         {
             get
             {
                 yield return () => new AfterClassHandler();
-                yield return () => new AfterHandler();
-                yield return () => new BeforeHandler();
+                yield return () => new AfterHandler(null);
+                yield return () => new BeforeHandler(null);
                 yield return () => new BeforeClassHandler();
-                yield return () => new TestHandler();
+                yield return () => new TestHandler(null);
                 yield return () => new MultipleBeforeTestAfterHandler();
             }
         }

@@ -18,9 +18,9 @@ namespace RunnerTests.Handlers
         private Mock<IMyNUnitHandler> failHandlerMock;
         private Mock<ITestClassWrapper> testClassMock;
         private TestResult testResult;
-        private volatile int afterHandleCallsNumber;
-        private volatile int beforeHandleCallsNumber;
-        private volatile int testHandleCallsNumber;
+        private static volatile int afterHandleCallsNumber;
+        private static volatile int beforeHandleCallsNumber;
+        private static volatile int testHandleCallsNumber;
 
         public void Before()
         {
@@ -46,7 +46,8 @@ namespace RunnerTests.Handlers
             testClassMock = new Mock<ITestClassWrapper>();
             failHandlerMock = new Mock<IMyNUnitHandler>();
             successHandlerMock = new Mock<IMyNUnitHandler>();
-            handler = new MultipleBeforeTestAfterHandler(successHandlerMock.Object, failHandlerMock.Object);
+            handler = new MultipleBeforeTestAfterHandler(successHandlerMock.Object,
+                failHandlerMock.Object);
             afterHandleCallsNumber = 0;
             beforeHandleCallsNumber = 0;
             testHandleCallsNumber = 0;
@@ -55,9 +56,11 @@ namespace RunnerTests.Handlers
         [Test]
         public void Call_HandleMethods_Of_Before_Test_After_Handlers()
         {
-            testClassMock.Setup(testClass => testClass.TestClassInstance).Returns(this).Verifiable();
-            testClassMock.Setup(testClass => testClass.TestMethodInfos).Returns(
-                new ConcurrentQueue<MethodInfo>(new[]
+            testClassMock.Setup(testClass => testClass.ClassType)
+                .Returns(GetType())
+                .Verifiable();
+            testClassMock.Setup(testClass => testClass.TestMethodInfos)
+                .Returns(new ConcurrentQueue<MethodInfo>(new[]
                 {
                     GetType().GetMethod(nameof(Test)),
                     GetType().GetMethod(nameof(Test)),

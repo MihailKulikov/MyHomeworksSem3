@@ -11,8 +11,6 @@ namespace MyNUnit.Runner
     /// </summary>
     public class RunnerCli
     {
-        private const string IntroduceMessage = "Enter the path to the assemblies:";
-
         private const string ExceptionMessage =
             "The following exceptions were thrown in the After, AfterClass, Before, BeforeClass blocks:";
 
@@ -43,7 +41,6 @@ namespace MyNUnit.Runner
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task Run(string path)
         {
-            await textWriter.WriteLineAsync(IntroduceMessage);
             IEnumerable<ITestClassWrapper> testClasses;
             try
             {

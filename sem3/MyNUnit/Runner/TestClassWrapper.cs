@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using MyNUnit.Attributes;
 using MyNUnit.Runner.Interfaces;
 
@@ -14,8 +13,6 @@ namespace MyNUnit.Runner
     /// </summary>
     public class TestClassWrapper : ITestClassWrapper
     {
-        private readonly ConcurrentQueue<object?> testClassInstances;
-
         /// <summary>
         /// Initialize a new instance of the <see cref="TestClassWrapper"/> class which is a wrapper for a test class of the specified type. 
         /// </summary>
@@ -36,17 +33,7 @@ namespace MyNUnit.Runner
                 .Where(info => info.GetParameters().Length == 0)
                 .Where(info => info.ReturnType == typeof(void))
                 .Where(info => !info.IsStatic));
-
-            testClassInstances = new ConcurrentQueue<object?>();
-            Parallel.For(0, TestMethodInfos.Count,
-                num => { testClassInstances.Enqueue(Activator.CreateInstance(classType)); });
         }
-
-        /// <summary>
-        /// Gets test class instance.
-        /// </summary>
-        public object? TestClassInstance =>
-            testClassInstances.TryDequeue(out var testClassInstance) ? testClassInstance : null;
 
         /// <summary>
         /// Gets test class type.

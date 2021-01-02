@@ -89,10 +89,10 @@ namespace RunnerTests.Handlers
             testResult = new TestResult("Something", new ConcurrentQueue<Exception>(),
                 new ConcurrentQueue<ITestMethod>());
             testClassMock = new Mock<ITestClassWrapper>();
-            testClassMock.Setup(testClass => testClass.TestClassInstance).Returns(this);
             successHandlerMock = new Mock<IMyNUnitHandler>();
             failHandlerMock = new Mock<IMyNUnitHandler>();
-            handler = new TestHandler(successHandlerMock.Object, failHandlerMock.Object);
+            handler = new TestHandler(Activator.CreateInstance(GetType()), successHandlerMock.Object,
+                failHandlerMock.Object);
         }
 
         [Test]
@@ -139,7 +139,6 @@ namespace RunnerTests.Handlers
             handler.Handle(testResult, testClassMock.Object);
 
             testClassMock.Verify();
-            testClassMock.Verify(testClass => testClass.TestClassInstance, Times.Once);
             testClassMock.VerifyNoOtherCalls();
             VerifyCallingHandleMethodOfNextHandlers();
             AssertSuccessfulTest(nameof(ThrowsExpectedException));
@@ -155,7 +154,6 @@ namespace RunnerTests.Handlers
             handler.Handle(testResult, testClassMock.Object);
 
             testClassMock.Verify();
-            testClassMock.Verify(testClass => testClass.TestClassInstance, Times.Once);
             testClassMock.VerifyNoOtherCalls();
             VerifyCallingHandleMethodOfNextHandlers();
             AssertFailureTest(Exception, null, nameof(ThrowUnexpectedException));
@@ -172,22 +170,21 @@ namespace RunnerTests.Handlers
             handler.Handle(testResult, testClassMock.Object);
 
             testClassMock.Verify();
-            testClassMock.Verify(testClass => testClass.TestClassInstance, Times.Once);
             testClassMock.VerifyNoOtherCalls();
             VerifyCallingHandleMethodOfNextHandlers();
             AssertFailureTest(null, typeof(ArgumentException), nameof(DoesNotThrowExpectedException));
         }
 
-        [Test] public void Collect_Tests_That_Pass_Successfully()
+        [Test]
+        public void Collect_Tests_That_Pass_Successfully()
         {
             testClassMock.Setup(testClass => testClass.TestMethodInfos)
-                .Returns(new ConcurrentQueue<MethodInfo>(new [] {GetType().GetMethod(nameof(GoodTest))}))
+                .Returns(new ConcurrentQueue<MethodInfo>(new[] {GetType().GetMethod(nameof(GoodTest))}))
                 .Verifiable();
 
             handler.Handle(testResult, testClassMock.Object);
-            
+
             testClassMock.Verify();
-            testClassMock.Verify(testClass => testClass.TestClassInstance, Times.Once);
             testClassMock.VerifyNoOtherCalls();
             VerifyCallingHandleMethodOfNextHandlers();
             AssertSuccessfulTest(nameof(GoodTest));

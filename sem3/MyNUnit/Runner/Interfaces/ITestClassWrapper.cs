@@ -11,11 +11,6 @@ namespace MyNUnit.Runner.Interfaces
     public interface ITestClassWrapper
     {
         /// <summary>
-        /// Gets test class instance.
-        /// </summary>
-        public object? TestClassInstance { get; }
-
-        /// <summary>
         /// Gets test class type.
         /// </summary>
         public Type ClassType { get; }
