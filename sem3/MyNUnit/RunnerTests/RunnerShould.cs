@@ -15,9 +15,9 @@ namespace RunnerTests
     {
         private IRunner runner;
         private Mock<ITestClassWrapper> testClassMock;
-        private volatile int afterHandleCallsNumber;
-        private volatile int beforeHandleCallsNumber;
-        private volatile int testHandleCallsNumber;
+        private static volatile int afterHandleCallsNumber;
+        private static volatile int beforeHandleCallsNumber;
+        private static volatile int testHandleCallsNumber;
         private static volatile int afterClassHandleCallsNumber;
         private static volatile int beforeClassHandleCallsNumber;
 
@@ -63,7 +63,6 @@ namespace RunnerTests
         public void Run_Tests()
         {
             testClassMock.Setup(testClass => testClass.ClassType).Returns(GetType()).Verifiable();
-            testClassMock.Setup(testClass => testClass.TestClassInstance).Returns(this).Verifiable();
             testClassMock.Setup(testClass => testClass.TestMethodInfos).Returns(
                 new ConcurrentQueue<MethodInfo>(new[]
                 {

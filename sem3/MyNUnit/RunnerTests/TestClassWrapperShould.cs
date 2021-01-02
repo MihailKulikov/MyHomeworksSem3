@@ -61,7 +61,6 @@ namespace RunnerTests
                 Is.EquivalentTo(new[] {typeof(ForTest).GetMethod(nameof(ForTest.After))}));
             Assert.That(testClassWrapper.BeforeMethodInfos,
                 Is.EquivalentTo(new[] {typeof(ForTest).GetMethod(nameof(ForTest.Before))}));
-            Assert.That(testClassWrapper.TestClassInstance, Is.TypeOf<ForTest>());
             Assert.That(testClassWrapper.TestMethodInfos,
                 Is.EquivalentTo(new[] {typeof(ForTest).GetMethod(nameof(ForTest.Test))}));
             Assert.That(testClassWrapper.AfterClassMethodInfos,
