@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using MyNUnitWeb.Data;
 
 namespace MyNUnitWeb
 {
@@ -24,6 +26,9 @@ namespace MyNUnitWeb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            services.AddDbContext<MyNUnitWebContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("MyNUnitWebContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

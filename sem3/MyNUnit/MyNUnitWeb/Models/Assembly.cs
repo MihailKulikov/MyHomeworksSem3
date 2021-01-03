@@ -7,6 +7,6 @@ namespace MyNUnitWeb.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public IEnumerable<Test> Tests { get; set; }
+        public ICollection<AssemblyTest> Tests { get; set; }
     }
 }
