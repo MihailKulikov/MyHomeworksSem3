@@ -27,7 +27,7 @@ namespace MyNUnitWeb.Pages.Assemblies
         private readonly IAssemblyHandler assemblyHandler;
         private readonly IRunner runner;
 
-        [BindProperty] public FileUpload? FileUpload { get; set; }
+        [BindProperty] public FileUpload FileUpload { get; set; }
         public string? ResultOfUploading { get; private set; }
         public IEnumerable<Test> Tests { get; private set; } = new List<Test>();
 
@@ -156,7 +156,7 @@ namespace MyNUnitWeb.Pages.Assemblies
         }
     }
 
-    public abstract class FileUpload
+    public class FileUpload
     {
         [Required] public IFormFileCollection FormFiles { get; set; }
     }
