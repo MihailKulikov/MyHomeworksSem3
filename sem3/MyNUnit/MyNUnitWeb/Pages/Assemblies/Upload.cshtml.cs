@@ -87,22 +87,23 @@ namespace MyNUnitWeb.Pages.Assemblies
 
         public async Task<IActionResult> OnPostRunTestsAsync()
         {
-            var testClasses = assemblyHandler.GetTestClassesFromAssemblies(targetFilePath);
+            var testClasses = assemblyHandler.GetTestClassesFromAssemblies(targetFilePath).ToList();
             var testResults = runner.RunTests(testClasses).ToList();
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendJoin(", ", SavedFileNames);
             var assembly = new AssemblyDb {Name = stringBuilder.ToString()};
-            var tests = MapTestResultsToTestDbs(testResults, assembly);
+            var tests = MapTestResultsToTestDbs(testResults);
             assembly.Tests = tests;
             await context.Assemblies.AddAsync(assembly);
+            await context.Tests.AddRangeAsync(tests);
             await context.SaveChangesAsync();
+            var savedAssemblies = context.Assemblies.ToList();
             Tests = tests;
-            
+
             return Page();
         }
 
-        private static ICollection<TestDb> MapTestResultsToTestDbs(IEnumerable<TestResult> testResults,
-            AssemblyDb assembly)
+        private static ICollection<TestDb> MapTestResultsToTestDbs(IEnumerable<TestResult> testResults)
         {
             var tests = new List<TestDb>();
             foreach (var testMethod in testResults.SelectMany(result => result.TestMethods))
@@ -112,7 +113,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                     case IgnoredTestMethod ignoredTestMethod:
                         tests.Add(new TestDb
                         {
-                            Assembly = assembly, ElapsedTime = TimeSpan.Zero,
+                            ElapsedTime = TimeSpan.Zero,
                             ReasonForIgnoring = ignoredTestMethod.ReasonForIgnoring, Name = ignoredTestMethod.Name,
                             Status = TestStatus.Ignored
                         });
@@ -120,7 +121,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                     case SuccessfulTestMethod successfulTestMethod:
                         tests.Add(new TestDb
                         {
-                            Assembly = assembly, ElapsedTime = successfulTestMethod.ElapsedTime,
+                            ElapsedTime = successfulTestMethod.ElapsedTime,
                             Name = successfulTestMethod.Name,
                             ReasonForIgnoring = string.Empty,
                             Status = TestStatus.Success
@@ -129,7 +130,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                     case FailedTestMethod failedTestMethod:
                         tests.Add(new TestDb
                         {
-                            Assembly = assembly, ElapsedTime = failedTestMethod.ElapsedTime,
+                            ElapsedTime = failedTestMethod.ElapsedTime,
                             Name = failedTestMethod.Name,
                             ReasonForIgnoring = string.Empty,
                             Status = TestStatus.Failed

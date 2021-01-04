@@ -10,7 +10,7 @@ using MyNUnitWeb.Data;
 namespace MyNUnitWeb.Migrations
 {
     [DbContext(typeof(MyNUnitWebContext))]
-    [Migration("20210103165947_InitialCreate")]
+    [Migration("20210104011334_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,7 +21,7 @@ namespace MyNUnitWeb.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.1");
 
-            modelBuilder.Entity("MyNUnitWeb.Models.Assembly", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.AssemblyDb", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,17 +36,21 @@ namespace MyNUnitWeb.Migrations
                     b.ToTable("Assemblies");
                 });
 
-            modelBuilder.Entity("MyNUnitWeb.Models.Test", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.TestDb", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AssemblyId")
+                    b.Property<Guid?>("AssemblyDbId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<TimeSpan>("ElapsedTime")
                         .HasColumnType("time");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReasonForIgnoring")
                         .HasColumnType("nvarchar(max)");
@@ -56,23 +60,19 @@ namespace MyNUnitWeb.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssemblyId");
+                    b.HasIndex("AssemblyDbId");
 
-                    b.ToTable("Test");
+                    b.ToTable("Tests");
                 });
 
-            modelBuilder.Entity("MyNUnitWeb.Models.Test", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.TestDb", b =>
                 {
-                    b.HasOne("MyNUnitWeb.Models.Assembly", "Assembly")
+                    b.HasOne("MyNUnitWeb.Models.AssemblyDb", null)
                         .WithMany("Tests")
-                        .HasForeignKey("AssemblyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Assembly");
+                        .HasForeignKey("AssemblyDbId");
                 });
 
-            modelBuilder.Entity("MyNUnitWeb.Models.Assembly", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.AssemblyDb", b =>
                 {
                     b.Navigation("Tests");
                 });

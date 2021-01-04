@@ -20,36 +20,37 @@ namespace MyNUnitWeb.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Test",
+                name: "Tests",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ElapsedTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     ReasonForIgnoring = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AssemblyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AssemblyDbId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Test", x => x.Id);
+                    table.PrimaryKey("PK_Tests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Test_Assemblies_AssemblyId",
-                        column: x => x.AssemblyId,
+                        name: "FK_Tests_Assemblies_AssemblyDbId",
+                        column: x => x.AssemblyDbId,
                         principalTable: "Assemblies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Test_AssemblyId",
-                table: "Test",
-                column: "AssemblyId");
+                name: "IX_Tests_AssemblyDbId",
+                table: "Tests",
+                column: "AssemblyDbId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Test");
+                name: "Tests");
 
             migrationBuilder.DropTable(
                 name: "Assemblies");

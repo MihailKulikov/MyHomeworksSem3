@@ -10,7 +10,7 @@ namespace MyNUnitWeb.Data
         {
         }
 
-        public DbSet<TestDb> Test { get; set; }
+        public DbSet<TestDb> Tests { get; set; }
         public DbSet<AssemblyDb> Assemblies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

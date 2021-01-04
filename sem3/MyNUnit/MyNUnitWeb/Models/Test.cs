@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyNUnitWeb.Models
 {
@@ -21,9 +20,5 @@ namespace MyNUnitWeb.Models
         public TestStatus Status { get; set; }
         public TimeSpan ElapsedTime { get; set; }
         public string? ReasonForIgnoring { get; set; }
-        public Guid AssemblyId { get; set; }
-
-        [ForeignKey("AssemblyId")]
-        public virtual AssemblyDb Assembly { get; set; }
     }
 }
