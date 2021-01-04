@@ -56,7 +56,7 @@ namespace RunnerTests.Handlers
         {
             testClassInstance = Activator.CreateInstance(GetType());
             count = 0;
-            testResult = new TestResult("Something", new ConcurrentQueue<Exception>(),
+            testResult = new TestResult(It.IsAny<Type>(), new ConcurrentQueue<Exception>(),
                 new ConcurrentQueue<ITestMethod>());
             testClassMock = new Mock<ITestClassWrapper>();
             successHandlerMock = new Mock<IMyNUnitHandler>();

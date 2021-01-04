@@ -41,7 +41,7 @@ namespace RunnerTests.Handlers
         [SetUp]
         public void SetUp()
         {
-            testResult = new TestResult("Something", new ConcurrentQueue<Exception>(),
+            testResult = new TestResult(GetType(), new ConcurrentQueue<Exception>(),
                 new ConcurrentQueue<ITestMethod>());
             testClassMock = new Mock<ITestClassWrapper>();
             failHandlerMock = new Mock<IMyNUnitHandler>();

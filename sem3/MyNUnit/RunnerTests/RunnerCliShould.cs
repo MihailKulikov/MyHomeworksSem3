@@ -19,7 +19,8 @@ namespace RunnerTests
         private Mock<IAssemblyHandler> assemblyHandlerMock;
         private const string DirectoryNotFoundMessage = "Directory not found.";
         private const string Path = "Something";
-        private const string TestClassName = "Name";
+        private const string TestClassName = "System.String";
+        private Type testClassType = typeof(string);
 
         private const string ExceptionMessage =
             "The following exceptions were thrown in the After, AfterClass, Before, BeforeClass blocks:";
@@ -81,7 +82,7 @@ namespace RunnerTests
                 .Returns(testClassWrappers).Verifiable();
             runnerMock.Setup(runner => runner.RunTests(testClassWrappers)).Returns(new[]
             {
-                new TestResult(TestClassName, new ConcurrentQueue<Exception>(new[] {new Exception()}),
+                new TestResult(testClassType, new ConcurrentQueue<Exception>(new[] {new Exception()}),
                     new ConcurrentQueue<ITestMethod>())
             }).Verifiable();
 
@@ -103,7 +104,7 @@ namespace RunnerTests
                 .Verifiable();
             runnerMock.Setup(runner => runner.RunTests(testClassWrappers)).Returns(new[]
             {
-                new TestResult(TestClassName, new ConcurrentQueue<Exception>(),
+                new TestResult(testClassType, new ConcurrentQueue<Exception>(),
                     new ConcurrentQueue<ITestMethod>(new[] {testMethod}))
             }).Verifiable();
 

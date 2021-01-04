@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +22,8 @@ namespace MyNUnitWeb.Pages.Assemblies
         private readonly MyNUnitWebContext context;
         private readonly long fileSizeLimit;
         private readonly string[] permittedExtensions;
-        private readonly string targetFilePath;
+        private readonly string uploadedFilePath;
+        private readonly string testedFilePath;
         private readonly IAssemblyHandler assemblyHandler;
         private readonly IRunner runner;
 
@@ -31,7 +31,7 @@ namespace MyNUnitWeb.Pages.Assemblies
         public string ResultOfUploading { get; private set; }
         public IEnumerable<TestDb> Tests { get; private set; } = new List<TestDb>();
 
-        public List<string> SavedFileNames => Directory.EnumerateFiles(targetFilePath)
+        public List<string> SavedFileNames => Directory.EnumerateFiles(uploadedFilePath)
             .Select(fileName => fileName.Split('\\')[^1])
             .ToList();
 
@@ -39,7 +39,8 @@ namespace MyNUnitWeb.Pages.Assemblies
             IRunner runner)
         {
             fileSizeLimit = config.GetValue<long>("FileSizeLimit");
-            targetFilePath = config.GetValue<string>("StoredFilesPath");
+            uploadedFilePath = config.GetValue<string>("UploadedFilesPath");
+            testedFilePath = config.GetValue<string>("TestedFilesPath");
             permittedExtensions = config.GetValue<string[]>("PermittedExtensions");
             this.context = context;
             this.assemblyHandler = assemblyHandler;
@@ -72,7 +73,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                     return Page();
                 }
 
-                var filePath = Path.Combine(targetFilePath, formFile.FileName);
+                var filePath = Path.Combine(uploadedFilePath, formFile.FileName);
                 await using var fileStream = System.IO.File.Create(filePath);
                 await fileStream.WriteAsync(formFileContent);
                 SavedFileNames.Add(filePath);
@@ -87,26 +88,42 @@ namespace MyNUnitWeb.Pages.Assemblies
 
         public async Task<IActionResult> OnPostRunTestsAsync()
         {
-            var testClasses = assemblyHandler.GetTestClassesFromAssemblies(targetFilePath).ToList();
+            var testClasses = assemblyHandler.GetTestClassesFromAssemblies(uploadedFilePath);
             var testResults = runner.RunTests(testClasses).ToList();
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendJoin(", ", SavedFileNames);
-            var assembly = new AssemblyDb {Name = stringBuilder.ToString()};
-            var tests = MapTestResultsToTestDbs(testResults);
-            assembly.Tests = tests;
-            await context.Assemblies.AddAsync(assembly);
-            await context.Tests.AddRangeAsync(tests);
+            var assemblies = testResults
+                .Select(result => result.ClassType.Assembly)
+                .Distinct()
+                .Select(assembly =>
+            {
+                var results = testResults.ToList();
+                return new AssemblyDb
+                {
+                    Name = assembly.FullName ?? "",
+                    Tests = results.Where(testResult => testResult.ClassType.Assembly.Equals(assembly))
+                        .SelectMany(MapTestResultToTestDbs).ToList()
+                };
+            }).ToList();
+            Tests = assemblies.SelectMany(assembly => assembly.Tests);
+            await context.Assemblies.AddRangeAsync(assemblies);
+            await context.Tests.AddRangeAsync(Tests);
             await context.SaveChangesAsync();
-            var savedAssemblies = context.Assemblies.ToList();
-            Tests = tests;
 
+            MoveAllFilesInDirectory(uploadedFilePath);
             return Page();
         }
 
-        private static ICollection<TestDb> MapTestResultsToTestDbs(IEnumerable<TestResult> testResults)
+        private void MoveAllFilesInDirectory(string path)
+        {
+            foreach (var file in Directory.EnumerateFiles(path))
+            {
+                System.IO.File.Move(file, Path.Combine(testedFilePath, Path.GetRandomFileName()));
+            }
+        }
+
+        private static ICollection<TestDb> MapTestResultToTestDbs(TestResult testResult)
         {
             var tests = new List<TestDb>();
-            foreach (var testMethod in testResults.SelectMany(result => result.TestMethods))
+            foreach (var testMethod in testResult.TestMethods)
             {
                 switch (testMethod)
                 {

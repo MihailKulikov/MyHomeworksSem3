@@ -17,15 +17,11 @@ namespace MyNUnitWeb.Utilities
             long sizeLimit)
         {
             var fieldDisplayName = string.Empty;
-
-            // Use reflection to obtain the display name for the model
-            // property associated with this IFormFile. If a display
-            // name isn't found, error messages simply won't show
-            // a display name.
+            
             MemberInfo property =
                 typeof(T).GetProperty(
                     formFile.Name.Substring(formFile.Name.IndexOf(".",
-                    StringComparison.Ordinal) + 1));
+                        StringComparison.Ordinal) + 1))!;
 
             if (property != null)
             {
@@ -35,14 +31,10 @@ namespace MyNUnitWeb.Utilities
                     fieldDisplayName = $"{displayAttribute.Name} ";
                 }
             }
-
-            // Don't trust the file name sent by the client. To display
-            // the file name, HTML-encode the value.
+            
             var trustedFileNameForDisplay = WebUtility.HtmlEncode(
                 formFile.FileName);
-
-            // Check the file length. This check doesn't catch files that only have 
-            // a BOM as their content.
+            
             if (formFile.Length == 0)
             {
                 modelState.AddModelError(formFile.Name,
@@ -58,17 +50,14 @@ namespace MyNUnitWeb.Utilities
                     $"{fieldDisplayName}({trustedFileNameForDisplay}) exceeds " +
                     $"{megabyteSizeLimit:N1} MB.");
 
-                return new byte[0];
+                return Array.Empty<byte>();
             }
 
             try
             {
-                using var memoryStream = new MemoryStream();
+                await using var memoryStream = new MemoryStream();
                 await formFile.CopyToAsync(memoryStream);
-
-                // Check the content length in case the file's only
-                // content was a BOM and the content is actually
-                // empty after removing the BOM.
+                
                 if (memoryStream.Length == 0)
                 {
                     modelState.AddModelError(formFile.Name,
@@ -93,15 +82,14 @@ namespace MyNUnitWeb.Utilities
                 modelState.AddModelError(formFile.Name,
                     $"{fieldDisplayName}({trustedFileNameForDisplay}) upload failed. " +
                     $"Please contact the Help Desk for support. Error: {ex.HResult}");
-                // Log the exception
             }
 
-            return new byte[0];
+            return Array.Empty<byte>();
         }
 
         private static bool IsValidFileExtension(string fileName, Stream data, string[] permittedExtensions)
         {
-            if (string.IsNullOrEmpty(fileName) || data == null || data.Length == 0)
+            if (string.IsNullOrEmpty(fileName) || data.Length == 0)
             {
                 return false;
             }
