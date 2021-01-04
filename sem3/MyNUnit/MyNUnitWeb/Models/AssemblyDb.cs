@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyNUnitWeb.Models
 {
-    public class Assembly
+    public class AssemblyDb
     {
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<Test> Tests { get; set; }
+        public virtual ICollection<TestDb> Tests { get; set; }
     }
 }

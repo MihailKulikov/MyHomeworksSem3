@@ -1,13 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
+using MyNUnit.Runner;
+using MyNUnit.Runner.Interfaces;
+using MyNUnit.Runner.TestMethods;
 using MyNUnitWeb.Data;
+using MyNUnitWeb.Models;
 using MyNUnitWeb.Utilities;
 
 namespace MyNUnitWeb.Pages.Assemblies
@@ -18,23 +24,27 @@ namespace MyNUnitWeb.Pages.Assemblies
         private readonly long fileSizeLimit;
         private readonly string[] permittedExtensions;
         private readonly string targetFilePath;
+        private readonly IAssemblyHandler assemblyHandler;
+        private readonly IRunner runner;
 
-        [BindProperty]
-        public FileUpload FileUpload { get; set; }
-
-        public string Result { get; private set; }
+        [BindProperty] public FileUpload FileUpload { get; set; }
+        public string ResultOfUploading { get; private set; }
+        public IEnumerable<TestDb> Tests { get; private set; } = new List<TestDb>();
 
         public List<string> SavedFileNames => Directory.EnumerateFiles(targetFilePath)
             .Select(fileName => fileName.Split('\\')[^1])
             .ToList();
 
-        public LoadModel(MyNUnitWebContext context, IConfiguration config)
+        public LoadModel(MyNUnitWebContext context, IConfiguration config, IAssemblyHandler assemblyHandler,
+            IRunner runner)
         {
             fileSizeLimit = config.GetValue<long>("FileSizeLimit");
             targetFilePath = config.GetValue<string>("StoredFilesPath");
             permittedExtensions = config.GetValue<string[]>("PermittedExtensions");
             this.context = context;
-            permittedExtensions = new[] { ".dll" };
+            this.assemblyHandler = assemblyHandler;
+            this.runner = runner;
+            permittedExtensions = new[] {".dll"};
         }
 
         public IActionResult OnGet()
@@ -46,7 +56,7 @@ namespace MyNUnitWeb.Pages.Assemblies
         {
             if (!ModelState.IsValid)
             {
-                Result = "Please correct the form";
+                ResultOfUploading = "Please correct the form";
 
                 return Page();
             }
@@ -57,7 +67,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                     formFile, ModelState, permittedExtensions, fileSizeLimit);
                 if (!ModelState.IsValid)
                 {
-                    Result = "File extension should be .dll";
+                    ResultOfUploading = "File extension should be .dll";
 
                     return Page();
                 }
@@ -74,11 +84,66 @@ namespace MyNUnitWeb.Pages.Assemblies
 
             //return RedirectToPage("./Index");
         }
+
+        public async Task<IActionResult> OnPostRunTestsAsync()
+        {
+            var testClasses = assemblyHandler.GetTestClassesFromAssemblies(targetFilePath);
+            var testResults = runner.RunTests(testClasses).ToList();
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendJoin(", ", SavedFileNames);
+            var assembly = new AssemblyDb {Name = stringBuilder.ToString()};
+            var tests = MapTestResultsToTestDbs(testResults, assembly);
+            assembly.Tests = tests;
+            await context.Assemblies.AddAsync(assembly);
+            await context.SaveChangesAsync();
+            Tests = tests;
+            
+            return Page();
+        }
+
+        private static ICollection<TestDb> MapTestResultsToTestDbs(IEnumerable<TestResult> testResults,
+            AssemblyDb assembly)
+        {
+            var tests = new List<TestDb>();
+            foreach (var testMethod in testResults.SelectMany(result => result.TestMethods))
+            {
+                switch (testMethod)
+                {
+                    case IgnoredTestMethod ignoredTestMethod:
+                        tests.Add(new TestDb
+                        {
+                            Assembly = assembly, ElapsedTime = TimeSpan.Zero,
+                            ReasonForIgnoring = ignoredTestMethod.ReasonForIgnoring, Name = ignoredTestMethod.Name,
+                            Status = TestStatus.Ignored
+                        });
+                        break;
+                    case SuccessfulTestMethod successfulTestMethod:
+                        tests.Add(new TestDb
+                        {
+                            Assembly = assembly, ElapsedTime = successfulTestMethod.ElapsedTime,
+                            Name = successfulTestMethod.Name,
+                            ReasonForIgnoring = string.Empty,
+                            Status = TestStatus.Success
+                        });
+                        break;
+                    case FailedTestMethod failedTestMethod:
+                        tests.Add(new TestDb
+                        {
+                            Assembly = assembly, ElapsedTime = failedTestMethod.ElapsedTime,
+                            Name = failedTestMethod.Name,
+                            ReasonForIgnoring = string.Empty,
+                            Status = TestStatus.Failed
+                        });
+                        break;
+                }
+            }
+
+            return tests;
+        }
     }
 
     public class FileUpload
     {
-        [Required]
-        public IFormFileCollection FormFiles { get; set; }
+        [Required] public IFormFileCollection FormFiles { get; set; }
     }
 }

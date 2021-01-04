@@ -11,11 +11,12 @@ namespace MyNUnitWeb.Models
         Ignored
     }
     
-    public class Test
+    public class TestDb
     {
         [Key]
         public Guid Id { get; set; }
 
+        public string Name { get; set; }
         [EnumDataType(typeof(TestStatus))]
         public TestStatus Status { get; set; }
         public TimeSpan ElapsedTime { get; set; }
@@ -23,6 +24,6 @@ namespace MyNUnitWeb.Models
         public Guid AssemblyId { get; set; }
 
         [ForeignKey("AssemblyId")]
-        public virtual Assembly Assembly { get; set; }
+        public virtual AssemblyDb Assembly { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace MyNUnitWeb.Pages.Assemblies
         }
 
         [BindProperty]
-        public Assembly Assembly { get; set; }
+        public AssemblyDb Assembly { get; set; }
 
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {

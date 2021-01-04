@@ -19,7 +19,7 @@ namespace MyNUnitWeb.Pages.Assemblies
             _context = context;
         }
 
-        public IList<Assembly> Assembly { get;set; }
+        public IList<AssemblyDb> Assembly { get;set; }
 
         public async Task OnGetAsync()
         {

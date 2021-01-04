@@ -1,5 +1,7 @@
 ﻿@page
 @using System.IO
+@using MyNUnit.Runner
+@using MyNUnit.Runner.TestMethods
 @model MyNUnitWeb.Pages.Assemblies.LoadModel
 
 @{
@@ -40,7 +42,7 @@
 </form>
 
 <p class="result">
-    @Model.Result
+    @Model.ResultOfUploading
 </p>
 
 <div>
@@ -51,8 +53,30 @@
 </div>
 
 <form method="post">
-    <button type="button" asp-page-handler="RunTest">Run tests</button>
+    <input asp-page-handler="RunTests" type="submit" value="Run tests" />
+    @*<button type="button" asp-page-handler="RunTests">Run tests</button>*@
 </form>
+
+@if (Model.Tests.Count() > 0)
+{
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Elapsed time</th>
+        <th>Reason for ignoring</th>
+    </tr>
+    @foreach (var test in Model.Tests)
+    {
+        <tr>
+            <td>@test.Name</td>
+            <td>@test.Status</td>
+            <td>@test.ElapsedTime.Milliseconds</td>
+            <td>@test.ReasonForIgnoring</td>
+        </tr>
+    }
+</table>
+}
 
 <div>
     <a asp-page="Index">Back to List</a>
