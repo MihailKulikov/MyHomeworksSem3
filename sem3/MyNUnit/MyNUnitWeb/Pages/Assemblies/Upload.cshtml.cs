@@ -27,8 +27,8 @@ namespace MyNUnitWeb.Pages.Assemblies
         private readonly IAssemblyHandler assemblyHandler;
         private readonly IRunner runner;
 
-        [BindProperty] public FileUpload FileUpload { get; set; }
-        public string ResultOfUploading { get; private set; }
+        [BindProperty] public FileUpload? FileUpload { get; set; }
+        public string? ResultOfUploading { get; private set; }
         public IEnumerable<Test> Tests { get; private set; } = new List<Test>();
 
         public List<string> SavedFileNames => Directory.EnumerateFiles(uploadedFilePath)
@@ -80,10 +80,6 @@ namespace MyNUnitWeb.Pages.Assemblies
             }
 
             return Page();
-            //_context.Assemblies.Add(Assembly);
-            //await _context.SaveChangesAsync();
-
-            //return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostRunTestsAsync()
@@ -160,7 +156,7 @@ namespace MyNUnitWeb.Pages.Assemblies
         }
     }
 
-    public class FileUpload
+    public abstract class FileUpload
     {
         [Required] public IFormFileCollection FormFiles { get; set; }
     }
