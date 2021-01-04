@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -90,15 +88,15 @@ namespace MyNUnitWeb.Pages.Assemblies
                 .Select(result => result.ClassType.Assembly)
                 .Distinct()
                 .Select(assembly =>
-            {
-                var results = testResults.ToList();
-                return new Assembly
                 {
-                    Name = assembly.FullName ?? "",
-                    Tests = results.Where(testResult => testResult.ClassType.Assembly.Equals(assembly))
-                        .SelectMany(MapTestResultToTestDbs).ToList()
-                };
-            }).ToList();
+                    var results = testResults.ToList();
+                    return new Assembly
+                    {
+                        Name = assembly.FullName ?? "",
+                        Tests = results.Where(testResult => testResult.ClassType.Assembly.Equals(assembly))
+                            .SelectMany(MapTestResultToTestDbs).ToList()
+                    };
+                }).ToList();
             Tests = assemblies.SelectMany(assembly => assembly.Tests);
             await context.Assemblies.AddRangeAsync(assemblies);
             await context.Tests.AddRangeAsync(Tests);
@@ -154,10 +152,5 @@ namespace MyNUnitWeb.Pages.Assemblies
 
             return tests;
         }
-    }
-
-    public class FileUpload
-    {
-        [Required] public IFormFileCollection FormFiles { get; set; }
     }
 }
