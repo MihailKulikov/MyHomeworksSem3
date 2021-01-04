@@ -19,29 +19,31 @@ namespace MyNUnitWeb.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.1");
 
-            modelBuilder.Entity("MyNUnitWeb.Models.AssemblyDb", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.Assembly", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("AssemblyId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("AssemblyId");
 
                     b.ToTable("Assemblies");
                 });
 
-            modelBuilder.Entity("MyNUnitWeb.Models.TestDb", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.Test", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("TestId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
 
-                    b.Property<Guid?>("AssemblyDbId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("AssemblyId")
+                        .HasColumnType("int");
 
                     b.Property<TimeSpan>("ElapsedTime")
                         .HasColumnType("time");
@@ -51,26 +53,27 @@ namespace MyNUnitWeb.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReasonForIgnoring")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("TestId");
 
-                    b.HasIndex("AssemblyDbId");
+                    b.HasIndex("AssemblyId");
 
                     b.ToTable("Tests");
                 });
 
-            modelBuilder.Entity("MyNUnitWeb.Models.TestDb", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.Test", b =>
                 {
-                    b.HasOne("MyNUnitWeb.Models.AssemblyDb", null)
+                    b.HasOne("MyNUnitWeb.Models.Assembly", null)
                         .WithMany("Tests")
-                        .HasForeignKey("AssemblyDbId");
+                        .HasForeignKey("AssemblyId");
                 });
 
-            modelBuilder.Entity("MyNUnitWeb.Models.AssemblyDb", b =>
+            modelBuilder.Entity("MyNUnitWeb.Models.Assembly", b =>
                 {
                     b.Navigation("Tests");
                 });

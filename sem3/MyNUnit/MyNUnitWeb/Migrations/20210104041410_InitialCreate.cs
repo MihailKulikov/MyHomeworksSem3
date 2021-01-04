@@ -11,40 +11,42 @@ namespace MyNUnitWeb.Migrations
                 name: "Assemblies",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AssemblyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Assemblies", x => x.Id);
+                    table.PrimaryKey("PK_Assemblies", x => x.AssemblyId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Tests",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TestId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ElapsedTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    ReasonForIgnoring = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AssemblyDbId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ReasonForIgnoring = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AssemblyId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tests", x => x.Id);
+                    table.PrimaryKey("PK_Tests", x => x.TestId);
                     table.ForeignKey(
-                        name: "FK_Tests_Assemblies_AssemblyDbId",
-                        column: x => x.AssemblyDbId,
+                        name: "FK_Tests_Assemblies_AssemblyId",
+                        column: x => x.AssemblyId,
                         principalTable: "Assemblies",
-                        principalColumn: "Id",
+                        principalColumn: "AssemblyId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tests_AssemblyDbId",
+                name: "IX_Tests_AssemblyId",
                 table: "Tests",
-                column: "AssemblyDbId");
+                column: "AssemblyId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

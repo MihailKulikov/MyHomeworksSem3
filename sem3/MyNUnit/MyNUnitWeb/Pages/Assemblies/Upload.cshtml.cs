@@ -29,7 +29,7 @@ namespace MyNUnitWeb.Pages.Assemblies
 
         [BindProperty] public FileUpload FileUpload { get; set; }
         public string ResultOfUploading { get; private set; }
-        public IEnumerable<TestDb> Tests { get; private set; } = new List<TestDb>();
+        public IEnumerable<Test> Tests { get; private set; } = new List<Test>();
 
         public List<string> SavedFileNames => Directory.EnumerateFiles(uploadedFilePath)
             .Select(fileName => fileName.Split('\\')[^1])
@@ -96,7 +96,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                 .Select(assembly =>
             {
                 var results = testResults.ToList();
-                return new AssemblyDb
+                return new Assembly
                 {
                     Name = assembly.FullName ?? "",
                     Tests = results.Where(testResult => testResult.ClassType.Assembly.Equals(assembly))
@@ -120,15 +120,15 @@ namespace MyNUnitWeb.Pages.Assemblies
             }
         }
 
-        private static ICollection<TestDb> MapTestResultToTestDbs(TestResult testResult)
+        private static ICollection<Test> MapTestResultToTestDbs(TestResult testResult)
         {
-            var tests = new List<TestDb>();
+            var tests = new List<Test>();
             foreach (var testMethod in testResult.TestMethods)
             {
                 switch (testMethod)
                 {
                     case IgnoredTestMethod ignoredTestMethod:
-                        tests.Add(new TestDb
+                        tests.Add(new Test
                         {
                             ElapsedTime = TimeSpan.Zero,
                             ReasonForIgnoring = ignoredTestMethod.ReasonForIgnoring, Name = ignoredTestMethod.Name,
@@ -136,7 +136,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                         });
                         break;
                     case SuccessfulTestMethod successfulTestMethod:
-                        tests.Add(new TestDb
+                        tests.Add(new Test
                         {
                             ElapsedTime = successfulTestMethod.ElapsedTime,
                             Name = successfulTestMethod.Name,
@@ -145,7 +145,7 @@ namespace MyNUnitWeb.Pages.Assemblies
                         });
                         break;
                     case FailedTestMethod failedTestMethod:
-                        tests.Add(new TestDb
+                        tests.Add(new Test
                         {
                             ElapsedTime = failedTestMethod.ElapsedTime,
                             Name = failedTestMethod.Name,

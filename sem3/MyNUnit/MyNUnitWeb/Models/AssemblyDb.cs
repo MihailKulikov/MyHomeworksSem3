@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 
 namespace MyNUnitWeb.Models
 {
-    public class AssemblyDb
+    public class Assembly
     {
-        [Key]
-        public Guid Id { get; set; }
+        public int AssemblyId { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<TestDb> Tests { get; set; }
+        public virtual ICollection<Test> Tests { get; set; }
     }
 }

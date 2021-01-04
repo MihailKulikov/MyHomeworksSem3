@@ -8,16 +8,25 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Assembly</h4>
+    <h4>@Html.DisplayFor(model => model.Assembly.Name)</h4>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Assembly.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Assembly.Name)
-        </dd>
-    </dl>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Elapsed time</th>
+            <th>Reason for ignoring</th>
+        </tr>
+        @foreach (var test in Model.Assembly.Tests)
+        {
+            <tr>
+                <td>@test.Name</td>
+                <td>@test.Status</td>
+                <td>@test.ElapsedTime.Milliseconds</td>
+                <td>@test.ReasonForIgnoring</td>
+            </tr>
+        }
+    </table>
 </div>
 <div>
     <a asp-page="./History">Back to List</a>

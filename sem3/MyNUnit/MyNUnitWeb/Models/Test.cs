@@ -10,15 +10,13 @@ namespace MyNUnitWeb.Models
         Ignored
     }
     
-    public class TestDb
+    public class Test
     {
-        [Key]
-        public Guid Id { get; set; }
-
+        public int TestId { get; set; }
         public string Name { get; set; }
         [EnumDataType(typeof(TestStatus))]
         public TestStatus Status { get; set; }
         public TimeSpan ElapsedTime { get; set; }
-        public string? ReasonForIgnoring { get; set; }
+        public string ReasonForIgnoring { get; set; }
     }
 }
