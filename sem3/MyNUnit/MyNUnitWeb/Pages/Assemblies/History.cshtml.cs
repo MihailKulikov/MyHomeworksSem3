@@ -23,7 +23,7 @@ namespace MyNUnitWeb.Pages.Assemblies
 
         public async Task OnGetAsync()
         {
-            Assembly = await _context.Assemblies.ToListAsync();
+            Assembly = await _context.Assemblies.Include("Tests").ToListAsync();
         }
     }
 }
