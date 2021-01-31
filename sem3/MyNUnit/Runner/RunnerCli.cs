@@ -59,7 +59,7 @@ namespace MyNUnit.Runner
         {
             foreach (var result in results)
             {
-                await textWriter.WriteLineAsync(result.ClassName);
+                await textWriter.WriteLineAsync(result.ClassType.FullName);
 
                 if (!result.Exceptions.IsEmpty)
                 {

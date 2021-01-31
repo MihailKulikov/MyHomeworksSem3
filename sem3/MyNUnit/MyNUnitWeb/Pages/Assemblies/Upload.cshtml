@@ -1,0 +1,70 @@
+﻿@page
+@model MyNUnitWeb.Pages.Assemblies.LoadModel
+
+@{
+    ViewData["Title"] = "Upload";
+}
+
+<h1>Upload</h1>
+
+<h4>Assembly</h4>
+<hr />
+
+<form enctype="multipart/form-data" method="post">
+    <dl>
+        <dt>
+            <label asp-for="FileUpload.FormFiles">Upload new assemblies:</label>
+        </dt>
+        <dd>
+            <input asp-for="FileUpload.FormFiles" type="file" multiple accept=".dll">
+            <span asp-validation-for="FileUpload.FormFiles"></span>
+        </dd>
+    </dl>
+    <input asp-page-handler="Upload" type="submit" value="Upload" />
+</form>
+
+<p class="result">
+    @Model.ResultOfUploading
+</p>
+
+<div>
+    @foreach (var loadedFileName in Model.SavedFileNames)
+    {
+        <li>@loadedFileName</li>
+    }
+</div>
+
+<form method="post">
+    <input asp-page-handler="RunTests" type="submit" value="Run tests" />
+    @*<button type="button" asp-page-handler="RunTests">Run tests</button>*@
+</form>
+
+@if (Model.Tests.Any())
+{
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Elapsed time</th>
+        <th>Reason for ignoring</th>
+    </tr>
+    @foreach (var test in Model.Tests)
+    {
+        <tr>
+            <td>@test.Name</td>
+            <td>@test.Status</td>
+            <td>@test.ElapsedTime.Milliseconds</td>
+            <td>@test.ReasonForIgnoring</td>
+        </tr>
+    }
+</table>
+}
+
+<div>
+    <a asp-page="History">Back to List</a>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

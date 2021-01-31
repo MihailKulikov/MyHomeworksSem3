@@ -12,21 +12,21 @@ namespace MyNUnit.Runner
         /// <summary>
         /// Initialize a new instance of the <see cref="TestResult"/> class with specified useful information.
         /// </summary>
-        /// <param name="className">Name of the test class whose information about running tests this instance store.</param>
+        /// <param name="classType">Type of the test class whose information about running tests this instance store.</param>
         /// <param name="exceptions">Exceptions thrown while running non-test methods.</param>
         /// <param name="testMethods">Collection of the <see cref="ITestMethod"/> instances for storing test runs information.</param>
-        public TestResult(string className, ConcurrentQueue<Exception> exceptions,
+        public TestResult(Type classType, ConcurrentQueue<Exception> exceptions,
             ConcurrentQueue<ITestMethod> testMethods)
         {
-            ClassName = className;
+            ClassType = classType;
             Exceptions = exceptions;
             TestMethods = testMethods;
         }
 
         /// <summary>
-        /// Gets name of the test class whose information about running tests this instance store.
+        /// Gets type of the test class whose information about running tests this instance store.
         /// </summary>
-        public string ClassName { get; }
+        public Type ClassType { get; }
 
         /// <summary>
         /// Gets exceptions thrown while running non-test methods.
