@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:ClientGUI"
       mc:Ignorable="d" 
       d:DesignHeight="200" d:DesignWidth="340">
-    <DockPanel LastChildFill="False">
+    <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Viewbox DockPanel.Dock="Top">
             <Label x:Name="Instruction" HorizontalContentAlignment="Center" Content="Enter the server address and port."  VerticalAlignment="Center" Height="50" Width="600" RenderTransformOrigin="0.5,0.5" FontSize="20">
                 <Label.RenderTransform>
@@ -19,10 +19,10 @@
                 </Label.RenderTransform>
             </Label>
         </Viewbox>
-        <Grid  MinWidth="340" MinHeight="150" DockPanel.Dock="Bottom">
+        <Grid  DockPanel.Dock="Bottom" MinWidth="340" MinHeight="150">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*"/>
-                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition  Height="1*" />
@@ -31,7 +31,7 @@
             </Grid.RowDefinitions>
             <Label FontSize="25" FontWeight="Bold" Content="Address :" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
             <Label FontSize="25" HorizontalAlignment="Right" VerticalAlignment="Top" FontWeight="Bold" Grid.Column="0" Grid.Row="1" Content="Port :"/>
-            <TextBox FontFamily="25" Grid.Column="1" Grid.Row="0" x:Name="Address" MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,9"/>
+            <TextBox FontFamily="25" Grid.Column="1" Grid.Row="0" x:Name="Address" MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
             <TextBox FontFamily="25" Grid.Column="1" Grid.Row="1" x:Name="Port" MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
             <Button Grid.Row="2" Grid.ColumnSpan ="3" Content="Connect!" FontSize="25" HorizontalAlignment="Center" VerticalAlignment="Center" Height="56" Width="170"/>
         </Grid>
