@@ -1,0 +1,6 @@
+﻿namespace ClientGUI
+{
+    class ModelView
+    {
+    }
+}
