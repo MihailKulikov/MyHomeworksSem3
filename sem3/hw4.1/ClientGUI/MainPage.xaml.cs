@@ -16,11 +16,17 @@ namespace ClientGUI
     /// <summary>
     /// Interaction logic for MainPage.xaml
     /// </summary>
-    public partial class MainPage : UserControl
+    public partial class MainPage : Window
     {
         public MainPage()
         {
             InitializeComponent();
+        }
+
+        public MainPage(ViewModel viewModel) : this()
+        {
+            DataContext = viewModel;
+            SelectDirectoryButton.Click += (sender, args) => MessageBox.Show($"{viewModel.Address} + {viewModel.Port}");
         }
     }
 }

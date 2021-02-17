@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:ClientGUI"
         mc:Ignorable="d"
         Title="MainWindow" Height="250" Width="350" MinWidth="350" MinHeight="250">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:CustomCommands.Connect}" CanExecute="ConnectCommand_CanExecute" Executed="ConnectCommand_Executed" />
+    </Window.CommandBindings>
     <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Viewbox DockPanel.Dock="Top">
             <Label x:Name="Instruction" HorizontalContentAlignment="Center" Content="Enter the server address and port."  VerticalAlignment="Center" Height="50" Width="600" RenderTransformOrigin="0.5,0.5" FontSize="20">
@@ -31,9 +34,9 @@
             </Grid.RowDefinitions>
             <Label FontSize="25" FontWeight="Bold" Content="Address :" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
             <Label FontSize="25" HorizontalAlignment="Right" VerticalAlignment="Top" FontWeight="Bold" Grid.Column="0" Grid.Row="1" Content="Port :"/>
-            <TextBox FontFamily="25" Grid.Column="1" Grid.Row="0" x:Name="Address" MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
-            <TextBox FontFamily="25" Grid.Column="1" Grid.Row="1" x:Name="Port" MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
-            <Button x:Name="ConnectionButton" Grid.Row="2" Grid.ColumnSpan ="3" Content="Connect!" FontSize="25" HorizontalAlignment="Center" VerticalAlignment="Center" Height="56" Width="170" Click="OnConnection"/>
+            <TextBox Text="{Binding Address}" FontFamily="25" Grid.Column="1" Grid.Row="0" x:Name="Address" MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
+            <TextBox Text="{Binding Port}" FontFamily="25" Grid.Column="1" Grid.Row="1" x:Name="Port" MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+            <Button x:Name="ConnectionButton" Command="{x:Static local:CustomCommands.Connect}" Grid.Row="2" Grid.ColumnSpan ="3" FontSize="25" HorizontalAlignment="Center" VerticalAlignment="Center" Height="56" Width="170"/>
         </Grid>
     </DockPanel>
 </Window>

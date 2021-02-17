@@ -5,21 +5,18 @@ using System.Threading.Tasks;
 
 namespace ClientGUI
 {
-    class ViewModel
+    public class ViewModel
     {
-        public int Port { get; set; } = 1;
-        public string Address { get; set; } = "localhost";
+        public int Port { get; set; } 
+        public string Address { get; set; }
 
         private IFtpClient ftpClient;
 
-        public ViewModel()
+        public ViewModel(int port, string adress, IFtpClient ftpClient)
         {
-        }
-
-        public async void Connect()
-        {
-            ftpClient = new FtpClient(
-                new FtpClientStreamHandler(await Task.Run(() => new TcpClient(Address, Port).GetStream())));
+            Port = port;
+            Address = adress;
+            this.ftpClient = ftpClient;
         }
     }
 }
