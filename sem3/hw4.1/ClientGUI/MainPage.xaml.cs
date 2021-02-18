@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ClientGUI.ItemTemplates;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ClientGUI
 {
@@ -26,7 +17,17 @@ namespace ClientGUI
         public MainPage(ViewModel viewModel) : this()
         {
             DataContext = viewModel;
-            SelectDirectoryButton.Click += (sender, args) => MessageBox.Show($"{viewModel.Address} + {viewModel.Port}");
+            //SelectDirectoryButton.Click += (sender, args) => MessageBox.Show($"{viewModel.ListResults.Count}");
+        }
+
+        public void GoToCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = (DirectoryList.SelectedItem as ListResult)?.IsDirectory ?? false;
+        }
+
+        public void GoToCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            (DataContext as ViewModel)?.GoTo((DirectoryList.SelectedItem as ListResult)?.Name ?? "./");
         }
     }
 }

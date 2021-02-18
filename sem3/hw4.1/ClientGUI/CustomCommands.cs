@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace ClientGUI
 {
@@ -11,6 +8,13 @@ namespace ClientGUI
         (
             "Connect!",
             "Connect",
+            typeof(CustomCommands)
+        );
+
+        public static RoutedUICommand GoTo { get; } = new RoutedUICommand
+        (
+            "Go to",
+            "Go to",
             typeof(CustomCommands)
         );
     }

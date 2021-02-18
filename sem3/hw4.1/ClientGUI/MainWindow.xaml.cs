@@ -43,7 +43,7 @@ namespace ClientGUI
                 MessageBox.Show(ServerConnectionErrorMessage, ErrorMessageBoxCaption);
                 return;
             }
-            var win = new MainPage(new ViewModel(port, address, new FtpClient(new FtpClientStreamHandler(tcpClient.GetStream()))));
+            var win = new MainPage(await ViewModel.BuildViewModel(port, address, new FtpClient(new FtpClientStreamHandler(tcpClient.GetStream()))));
             win.Show();
         }
 
