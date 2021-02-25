@@ -1,0 +1,33 @@
+﻿@page
+@model MyNUnitWeb.Pages.Assemblies.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>@Html.DisplayFor(model => model.Assembly.Name)</h4>
+    <hr />
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Elapsed time</th>
+            <th>Reason for ignoring</th>
+        </tr>
+        @foreach (var test in Model.Assembly.Tests)
+        {
+            <tr>
+                <td>@test.Name</td>
+                <td>@test.Status</td>
+                <td>@test.ElapsedTime.Milliseconds</td>
+                <td>@test.ReasonForIgnoring</td>
+            </tr>
+        }
+    </table>
+</div>
+<div>
+    <a asp-page="./History">Back to List</a>
+</div>
