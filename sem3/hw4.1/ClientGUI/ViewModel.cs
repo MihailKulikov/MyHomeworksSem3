@@ -9,11 +9,11 @@ namespace ClientGUI
 {
     public class ViewModel
     {
-        private const string root = "./"; 
-        public int Port { get; set; } 
+        private const string Root = "./";
+        public int Port { get; set; }
         public string Address { get; set; }
 
-        private string currentPath = root;
+        private string currentPath = Root;
 
         public ObservableCollection<ListResult> ListResults { get; set; } = new ObservableCollection<ListResult>();
 
@@ -22,7 +22,7 @@ namespace ClientGUI
         public static async Task<ViewModel> BuildViewModel(int port, string address, IFtpClient ftpClient)
         {
             var viewModel = new ViewModel(port, address, ftpClient);
-            await viewModel.GetListResults(root);
+            await viewModel.GetListResults(Root);
 
             return viewModel;
         }
@@ -36,16 +36,13 @@ namespace ClientGUI
 
         private async Task GetListResults(string path)
         {
-            for (var i = ListResults.Count - 1; i >= 0; i--)
-            {
-                ListResults.RemoveAt(i);
-            }
+            ListResults.Clear();
 
-            if (currentPath != root) ListResults.Add(new ListResult(true, ".."));
+            if (currentPath != Root) ListResults.Add(new ListResult(true, ".."));
             foreach (var item in (await ftpClient.ListAsync(path))
-               .AsParallel()
-               .Select(result => new ListResult(result.isDirectory, result.name))
-               .OrderBy(listResult => !listResult.IsDirectory))
+                .AsParallel()
+                .Select(result => new ListResult(result.isDirectory, result.name))
+                .OrderBy(listResult => !listResult.IsDirectory))
             {
                 ListResults.Add(item);
             }
@@ -53,8 +50,20 @@ namespace ClientGUI
 
         public async Task GoTo(string directoryName)
         {
-            currentPath = directoryName == ".." ? currentPath.Split('/')[0..^1].Aggregate("", (acc, item) => acc += item + '/') : Path.Combine(currentPath, directoryName);
+            currentPath = directoryName == ".."
+                ? currentPath.Split('/')[..^1].Aggregate("", (acc, item) => acc + (item + '/'))
+                : Path.Combine(currentPath, directoryName);
             await GetListResults(currentPath);
+        }
+
+        public async Task Download(string fileName)
+        {
+            
+        }
+
+        public async Task DownloadAll()
+        {
+            
         }
     }
 }

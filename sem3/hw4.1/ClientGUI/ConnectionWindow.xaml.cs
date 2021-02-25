@@ -1,5 +1,4 @@
 ﻿using Client;
-using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,21 +7,20 @@ using System.Windows.Input;
 namespace ClientGUI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ConnectionWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ConnectionWindow
     {
         private const string IncorrectPortMessage = "The port should be integer from 0 to 65535.";
-        private const string ServerConnectionErrorMessage = "Server connection error. Check the correctness of the data you entered.";
+
+        private const string ServerConnectionErrorMessage =
+            "Server connection error. Check the correctness of the data you entered.";
+
         private const string ErrorMessageBoxCaption = "Error";
 
-        public MainWindow()
+        public ConnectionWindow()
         {
             InitializeComponent();
-        }
-
-        private void OnConnection(object sender, EventArgs args)
-        {
         }
 
         private async void ConnectCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -32,6 +30,7 @@ namespace ClientGUI
                 MessageBox.Show(IncorrectPortMessage, ErrorMessageBoxCaption);
                 return;
             }
+
             var address = Address.Text;
             TcpClient tcpClient;
             try
@@ -43,7 +42,9 @@ namespace ClientGUI
                 MessageBox.Show(ServerConnectionErrorMessage, ErrorMessageBoxCaption);
                 return;
             }
-            var win = new MainPage(await ViewModel.BuildViewModel(port, address, new FtpClient(new FtpClientStreamHandler(tcpClient.GetStream()))));
+
+            var win = new WorkingWindow(await ViewModel.BuildViewModel(port, address,
+                new FtpClient(new FtpClientStreamHandler(tcpClient.GetStream()))));
             win.Show();
         }
 

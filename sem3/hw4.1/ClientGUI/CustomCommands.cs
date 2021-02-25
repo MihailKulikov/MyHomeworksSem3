@@ -17,5 +17,19 @@ namespace ClientGUI
             "Go to",
             typeof(CustomCommands)
         );
+
+        public static RoutedUICommand Download { get; } = new RoutedUICommand
+        (
+            "Download",
+            "Download",
+            typeof(CustomCommands)
+        );
+
+        public static RoutedUICommand DownloadAll { get; } = new RoutedUICommand
+        (
+            "Download All",
+            "Download All",
+            typeof(CustomCommands)
+        );
     }
 }

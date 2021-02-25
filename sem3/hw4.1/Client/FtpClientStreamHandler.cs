@@ -41,7 +41,7 @@ namespace Client
             }
 
             var intermediateStorage = new byte[BufferSize];
-            for (var i = 0; i < count / intermediateStorage.Length; i++)
+            for (var i = 0; i < count / BufferSize; i++)
             {
                 await streamReader.BaseStream.ReadAsync(intermediateStorage, 0, intermediateStorage.Length);
 
