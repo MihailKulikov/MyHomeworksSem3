@@ -14,8 +14,8 @@ namespace Client
     /// </summary>
     public class FtpClient : IFtpClient
     {
-        protected const string PathToDownloadsDirectory = "SimpleFtpDownloads";
-        protected readonly IFtpClientStreamHandler streamHandler;
+        private const string PathToDownloadsDirectory = "SimpleFtpDownloads";
+        private readonly IFtpClientStreamHandler streamHandler;
         private readonly string patternForSplittingListResponse = $"( {true} )|( {false} )|( {true})|( {false})";
 
         /// <summary>

@@ -36,15 +36,19 @@ namespace ClientGUI
 
         private void DownloadCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (DirectoryList.SelectedItem is ListResult file)
+            if (!(DirectoryList.SelectedItem is ListResult file)) return;
+            if (DataContext is ClientViewModel viewModel)
             {
-                (DataContext as ClientViewModel)?.Download(file.Name);
+                viewModel.Download(file.Name);
             }
         }
 
         private void DownloadAllCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            (DataContext as ClientViewModel)?.DownloadAll();
+            if (DataContext is ClientViewModel viewModel)
+            {
+                viewModel.DownloadAll();
+            }
         }
 
         private void DownloadAllCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)

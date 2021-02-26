@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Client;
 
 namespace ClientGUI
 {
@@ -42,7 +43,7 @@ namespace ClientGUI
                 return;
             }
 
-            using var ftpClient = new FtpClientGui(new FtpClientStreamHandlerGui(tcpClient.GetStream()));
+            var ftpClient = new FtpClient(new FtpClientStreamHandlerGui(tcpClient.GetStream()));
             var workingWindow = new WorkingWindow(await ClientViewModel.BuildViewModel(port, address, ftpClient));
             workingWindow.Show();
         }

@@ -33,7 +33,7 @@ namespace Client
         public async Task<int> ReadAsync(byte[] buffer, int offset, int count)
             => await streamReader.BaseStream.ReadAsync(buffer, offset, count);
 
-        public async Task CopyToAsync(Stream destination, long count)
+        public virtual async Task CopyToAsync(Stream destination, long count)
         {
             if (count < 0)
             {
@@ -55,6 +55,7 @@ namespace Client
         /// </summary>
         public void Dispose()
         {
+            streamReader.BaseStream.Dispose();
             streamWriter.Dispose();
             streamReader.Dispose();
         }

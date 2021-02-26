@@ -6,7 +6,7 @@ using ClientGUI.Interfaces;
 
 namespace ClientGUI
 {
-    public class FtpClientStreamHandlerGui :  FtpClientStreamHandler, IFtpClientStreamHandlerGui
+    public sealed class FtpClientStreamHandlerGui :  FtpClientStreamHandler, IFtpClientStreamHandlerGui
     {
         private const int BufferSize = 4096;
         
@@ -14,7 +14,7 @@ namespace ClientGUI
         {
         }
 
-        public async Task CopyToAsync(Stream destination, long count, Action<int> updatePercentageAction)
+        public override async Task CopyToAsync(Stream destination, long count)
         {
             if (count < 0)
             {
@@ -27,12 +27,19 @@ namespace ClientGUI
             {
                 await WriteFromStreamToStreamUsingBuffer(intermediateStorage, intermediateStorage.Length, destination);
                 percentage +=  BufferSize * 100.0 / count;
-                updatePercentageAction((int)percentage);
+                OnRaiseProgressChangedEvent(new ProgressChangedArgs((int) percentage));
             }
 
             await WriteFromStreamToStreamUsingBuffer(intermediateStorage, (int) count % intermediateStorage.Length,
                 destination);
-            updatePercentageAction(100);
+            OnRaiseProgressChangedEvent(new ProgressChangedArgs(100));
         }
+
+        private void OnRaiseProgressChangedEvent(ProgressChangedArgs e)
+        {
+            RaiseProgressChangedEvent(this, e);
+        }
+
+        public event EventHandler<ProgressChangedArgs> RaiseProgressChangedEvent = (sender, args) => { };
     }
 }

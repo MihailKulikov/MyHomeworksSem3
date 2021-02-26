@@ -6,7 +6,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Windows;
-using ClientGUI.Interfaces;
+using Client;
+using Client.Interfaces;
 
 namespace ClientGUI
 {
@@ -17,7 +18,7 @@ namespace ClientGUI
         public string Address { get; set; }
 
         private string currentPath = Root;
-        
+
         private const string ServerConnectionErrorMessage =
             "Server connection error.";
 
@@ -28,9 +29,9 @@ namespace ClientGUI
 
         public ObservableCollection<ListResult> ListResults { get; set; } = new ObservableCollection<ListResult>();
 
-        private readonly IFtpClientGui ftpClient;
+        private readonly IFtpClient ftpClient;
 
-        public static async Task<ClientViewModel> BuildViewModel(int port, string address, IFtpClientGui ftpClient)
+        public static async Task<ClientViewModel> BuildViewModel(int port, string address, IFtpClient ftpClient)
         {
             var viewModel = new ClientViewModel(port, address, ftpClient);
             await viewModel.GetListResults(Root);
@@ -38,7 +39,7 @@ namespace ClientGUI
             return viewModel;
         }
 
-        private ClientViewModel(int port, string address, IFtpClientGui ftpClient)
+        private ClientViewModel(int port, string address, IFtpClient ftpClient)
         {
             Port = port;
             Address = address;
@@ -84,9 +85,15 @@ namespace ClientGUI
                     return;
                 }
 
-                using var ftpClientForDownloading = new FtpClientGui(new FtpClientStreamHandlerGui(tcpClient.GetStream()));
-                await ftpClientForDownloading.GetAsync(fileName,
-                    progressPercentage => downloadFile.Completion = progressPercentage);
+                var ftpClientStreamHandlerGui = new FtpClientStreamHandlerGui(tcpClient.GetStream());
+                ftpClientStreamHandlerGui.RaiseProgressChangedEvent += (sender, args) =>
+                {
+                    downloadFile.Completion = args.Progress;
+                };
+                using var ftpClientForDownloading =
+                    new FtpClient(ftpClientStreamHandlerGui);
+                await ftpClientForDownloading.GetAsync(fileName);
+                tcpClient.Dispose();
             });
         }
 

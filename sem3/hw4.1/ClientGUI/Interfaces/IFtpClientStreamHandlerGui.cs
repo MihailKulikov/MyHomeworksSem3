@@ -7,6 +7,6 @@ namespace ClientGUI.Interfaces
 {
     public interface IFtpClientStreamHandlerGui : IFtpClientStreamHandler
     {
-        Task CopyToAsync(Stream destination, long count, Action<int> updateProgressPercentageAction);
+        public event EventHandler<ProgressChangedArgs> RaiseProgressChangedEvent;
     }
 }
