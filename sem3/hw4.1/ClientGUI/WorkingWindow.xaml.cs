@@ -14,7 +14,7 @@ namespace ClientGUI
             InitializeComponent();
         }
 
-        public WorkingWindow(ViewModel viewModel) : this()
+        public WorkingWindow(ClientViewModel viewModel) : this()
         {
             DataContext = viewModel;
         }
@@ -26,7 +26,7 @@ namespace ClientGUI
 
         private void GoToCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            (DataContext as ViewModel)?.GoTo((DirectoryList.SelectedItem as ListResult)?.Name ?? "./");
+            (DataContext as ClientViewModel)?.GoTo((DirectoryList.SelectedItem as ListResult)?.Name ?? "./");
         }
 
         private void DownloadCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -38,18 +38,19 @@ namespace ClientGUI
         {
             if (DirectoryList.SelectedItem is ListResult file)
             {
-                (DataContext as ViewModel)?.Download(file.Name);
+                (DataContext as ClientViewModel)?.Download(file.Name);
             }
         }
 
         private void DownloadAllCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            (DataContext as ViewModel)?.DownloadAll();
+            (DataContext as ClientViewModel)?.DownloadAll();
         }
 
         private void DownloadAllCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (DataContext as ViewModel)?.ListResults.FirstOrDefault(result => !result.IsDirectory) != null;
+            e.CanExecute =
+                (DataContext as ClientViewModel)?.ListResults.FirstOrDefault(result => !result.IsDirectory) != null;
         }
     }
 }

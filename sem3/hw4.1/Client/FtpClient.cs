@@ -14,8 +14,8 @@ namespace Client
     /// </summary>
     public class FtpClient : IFtpClient
     {
-        private const string PathToDownloadsDirectory = "SimpleFtpDownloads";
-        private readonly IFtpClientStreamHandler streamHandler;
+        protected const string PathToDownloadsDirectory = "SimpleFtpDownloads";
+        protected readonly IFtpClientStreamHandler streamHandler;
         private readonly string patternForSplittingListResponse = $"( {true} )|( {false} )|( {true})|( {false})";
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Client
             return await DownloadFile(size, path);
         }
 
-        private async Task<long> FindSizeOfFile()
+        protected async Task<long> FindSizeOfFile()
         {
             var buffer = new byte[long.MaxValue.ToString().Length + 1];
             await streamHandler.ReadAsync(buffer, 0, 2);

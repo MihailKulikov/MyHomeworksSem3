@@ -1,5 +1,4 @@
-﻿using Client;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -43,9 +42,9 @@ namespace ClientGUI
                 return;
             }
 
-            var win = new WorkingWindow(await ViewModel.BuildViewModel(port, address,
-                new FtpClient(new FtpClientStreamHandler(tcpClient.GetStream()))));
-            win.Show();
+            var workingWindow = new WorkingWindow(await ClientViewModel.BuildViewModel(port, address,
+                new FtpClientGui(new FtpClientStreamHandlerGui(tcpClient.GetStream()))));
+            workingWindow.Show();
         }
 
         private void ConnectCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)

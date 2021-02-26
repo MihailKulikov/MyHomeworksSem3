@@ -43,13 +43,11 @@ namespace Client
             var intermediateStorage = new byte[BufferSize];
             for (var i = 0; i < count / BufferSize; i++)
             {
-                await streamReader.BaseStream.ReadAsync(intermediateStorage, 0, intermediateStorage.Length);
-
-                await destination.WriteAsync(intermediateStorage);
+                await WriteFromStreamToStreamUsingBuffer(intermediateStorage, intermediateStorage.Length, destination);
             }
 
-            await streamReader.BaseStream.ReadAsync(intermediateStorage, 0, (int) count % intermediateStorage.Length);
-            await destination.WriteAsync(intermediateStorage, 0, (int) count % intermediateStorage.Length);
+            await WriteFromStreamToStreamUsingBuffer(intermediateStorage, (int) count % intermediateStorage.Length,
+                destination);
         }
 
         /// <summary>
@@ -59,6 +57,12 @@ namespace Client
         {
             streamWriter.Dispose();
             streamReader.Dispose();
+        }
+
+        protected async Task WriteFromStreamToStreamUsingBuffer(byte[] intermediateStorage, int count, Stream destination)
+        {
+            await streamReader.BaseStream.ReadAsync(intermediateStorage, 0, count);
+            await destination.WriteAsync(intermediateStorage, 0, count);
         }
     }
 }
