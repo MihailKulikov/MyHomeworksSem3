@@ -1,4 +1,5 @@
-﻿using ClientGUI.ItemTemplates;
+﻿using System;
+using ClientGUI.ItemTemplates;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.ObjectModel;
@@ -9,7 +10,7 @@ using ClientGUI.Interfaces;
 
 namespace ClientGUI
 {
-    public class ClientViewModel
+    public class ClientViewModel : IDisposable
     {
         private const string Root = "./";
         public int Port { get; set; }
@@ -82,8 +83,9 @@ namespace ClientGUI
                     MessageBox.Show(ServerConnectionErrorMessage, ErrorMessageBoxCaption);
                     return;
                 }
-                
-                await new FtpClientGui(new FtpClientStreamHandlerGui(tcpClient.GetStream())).GetAsync(fileName,
+
+                using var ftpClientForDownloading = new FtpClientGui(new FtpClientStreamHandlerGui(tcpClient.GetStream()));
+                await ftpClientForDownloading.GetAsync(fileName,
                     progressPercentage => downloadFile.Completion = progressPercentage);
             });
         }
@@ -94,6 +96,11 @@ namespace ClientGUI
             {
                 Download(listResult.Name);
             }
+        }
+
+        public void Dispose()
+        {
+            ftpClient.Dispose();
         }
     }
 }

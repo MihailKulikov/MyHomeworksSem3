@@ -42,8 +42,8 @@ namespace ClientGUI
                 return;
             }
 
-            var workingWindow = new WorkingWindow(await ClientViewModel.BuildViewModel(port, address,
-                new FtpClientGui(new FtpClientStreamHandlerGui(tcpClient.GetStream()))));
+            using var ftpClient = new FtpClientGui(new FtpClientStreamHandlerGui(tcpClient.GetStream()));
+            var workingWindow = new WorkingWindow(await ClientViewModel.BuildViewModel(port, address, ftpClient));
             workingWindow.Show();
         }
 
