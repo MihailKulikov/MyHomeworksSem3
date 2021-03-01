@@ -38,10 +38,10 @@
                    VerticalAlignment="Bottom"/>
             <Label FontSize="25" HorizontalAlignment="Right" VerticalAlignment="Top" FontWeight="Bold" Grid.Column="0"
                    Grid.Row="1" Content="Port :"/>
-            <TextBox Text="{Binding Address}" FontFamily="25" Grid.Column="1" Grid.Row="0" x:Name="Address"
+            <TextBox Text="{Binding Address}" FontFamily="25" Grid.Column="1" Grid.Row="0" x:Name="AddressBox"
                      MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                      Margin="10,0,0,10"/>
-            <TextBox  Text="{Binding Port}" FontFamily="25" Grid.Column="1" Grid.Row="1" x:Name="Port"
+            <TextBox  Text="{Binding Port}" FontFamily="25" Grid.Column="1" Grid.Row="1" x:Name="PortBox"
                       MinWidth="150" MinHeight="25" HorizontalAlignment="Left" VerticalAlignment="Top"
                       Margin="10,10,0,0"/>
             <Button x:Name="ConnectionButton" Command="{x:Static local:CustomCommands.Connect}"

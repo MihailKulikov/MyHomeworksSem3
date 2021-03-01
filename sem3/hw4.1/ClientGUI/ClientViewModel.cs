@@ -50,7 +50,11 @@ namespace ClientGUI
         {
             ListResults.Clear();
 
-            if (currentPath != Root) ListResults.Add(new ListResult(true, ".."));
+            if (currentPath != Root)
+            {
+                ListResults.Add(new ListResult(true, ".."));
+            }
+            
             foreach (var item in (await ftpClient.ListAsync(path))
                 .AsParallel()
                 .Select(result => new ListResult(result.isDirectory, result.name))
@@ -90,10 +94,11 @@ namespace ClientGUI
                 {
                     downloadFile.Completion = args.Progress;
                 };
-                using var ftpClientForDownloading =
+                var ftpClientForDownloading =
                     new FtpClient(ftpClientStreamHandlerGui);
                 await ftpClientForDownloading.GetAsync(fileName);
-                tcpClient.Dispose();
+                tcpClient.Close();
+                ftpClientForDownloading.Dispose();
             });
         }
 

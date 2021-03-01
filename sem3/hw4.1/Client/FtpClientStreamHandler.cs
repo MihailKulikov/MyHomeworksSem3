@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Client.Interfaces;
 
@@ -55,7 +56,10 @@ namespace Client
         /// </summary>
         public void Dispose()
         {
-            streamReader.BaseStream.Dispose();
+            if (streamReader.BaseStream is NetworkStream networkStream)
+            {
+                networkStream.Dispose();
+            }
             streamWriter.Dispose();
             streamReader.Dispose();
         }

@@ -18,20 +18,24 @@ namespace ClientGUI
 
         private const string ErrorMessageBoxCaption = "Error";
 
+        public int Port { get; set; } = 49001;
+        public string Address { get; set; } = "localhost";
+
         public ConnectionWindow()
         {
             InitializeComponent();
+            DataContext = this;
         }
 
         private async void ConnectCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!int.TryParse(Port.Text, out var port))
+            if (!int.TryParse(PortBox.Text, out var port))
             {
                 MessageBox.Show(IncorrectPortMessage, ErrorMessageBoxCaption);
                 return;
             }
 
-            var address = Address.Text;
+            var address = AddressBox.Text;
             TcpClient tcpClient;
             try
             {
@@ -50,7 +54,7 @@ namespace ClientGUI
 
         private void ConnectCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Address.Text.Length != 0 && Port.Text.Length != 0;
+            e.CanExecute = AddressBox.Text.Length != 0 && PortBox.Text.Length != 0;
         }
     }
 }

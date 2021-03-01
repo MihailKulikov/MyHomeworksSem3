@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using ClientGUI.ItemTemplates;
 using System.Windows.Input;
 
@@ -7,7 +8,7 @@ namespace ClientGUI
     /// <summary>
     /// Interaction logic for WorkingWindow.xaml
     /// </summary>
-    public partial class WorkingWindow
+    public partial class WorkingWindow : IDisposable
     {
         public WorkingWindow()
         {
@@ -55,6 +56,14 @@ namespace ClientGUI
         {
             e.CanExecute =
                 (DataContext as ClientViewModel)?.ListResults.FirstOrDefault(result => !result.IsDirectory) != null;
+        }
+
+        public void Dispose()
+        {
+            if (DataContext is ClientViewModel viewModel)
+            {
+                viewModel.Dispose();
+            }
         }
     }
 }
