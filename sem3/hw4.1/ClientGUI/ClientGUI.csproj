@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>netcoreapp3.1-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="fileIcon.png" />
+      <None Remove="folderIcon.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Client\Client.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Content\fileIcon.png" />
+      <Resource Include="Content\folderIcon.png" />
+    </ItemGroup>
+
+</Project>

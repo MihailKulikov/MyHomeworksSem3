@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Client.Interfaces;
 
@@ -33,7 +34,7 @@ namespace Client
         public async Task<int> ReadAsync(byte[] buffer, int offset, int count)
             => await streamReader.BaseStream.ReadAsync(buffer, offset, count);
 
-        public async Task CopyToAsync(Stream destination, long count)
+        public virtual async Task CopyToAsync(Stream destination, long count)
         {
             if (count < 0)
             {
@@ -41,15 +42,13 @@ namespace Client
             }
 
             var intermediateStorage = new byte[BufferSize];
-            for (var i = 0; i < count / intermediateStorage.Length; i++)
+            for (var i = 0; i < count / BufferSize; i++)
             {
-                await streamReader.BaseStream.ReadAsync(intermediateStorage, 0, intermediateStorage.Length);
-
-                await destination.WriteAsync(intermediateStorage);
+                await WriteFromStreamToStreamUsingBuffer(intermediateStorage, intermediateStorage.Length, destination);
             }
 
-            await streamReader.BaseStream.ReadAsync(intermediateStorage, 0, (int) count % intermediateStorage.Length);
-            await destination.WriteAsync(intermediateStorage, 0, (int) count % intermediateStorage.Length);
+            await WriteFromStreamToStreamUsingBuffer(intermediateStorage, (int) count % intermediateStorage.Length,
+                destination);
         }
 
         /// <summary>
@@ -57,8 +56,18 @@ namespace Client
         /// </summary>
         public void Dispose()
         {
+            if (streamReader.BaseStream is NetworkStream networkStream)
+            {
+                networkStream.Dispose();
+            }
             streamWriter.Dispose();
             streamReader.Dispose();
+        }
+
+        protected async Task WriteFromStreamToStreamUsingBuffer(byte[] intermediateStorage, int count, Stream destination)
+        {
+            await streamReader.BaseStream.ReadAsync(intermediateStorage, 0, count);
+            await destination.WriteAsync(intermediateStorage, 0, count);
         }
     }
 }

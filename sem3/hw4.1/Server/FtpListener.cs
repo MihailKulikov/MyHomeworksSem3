@@ -52,10 +52,12 @@ namespace Server
                 try
                 {
                     var request = await reader.ReadLineAsync();
-                    if (request != null)
+                    if (request == null)
                     {
-                        await ftpListenerRequestHandler.HandleRequestAsync(request);
+                        break;
                     }
+
+                    await ftpListenerRequestHandler.HandleRequestAsync(request);
                 }
                 catch
                 {

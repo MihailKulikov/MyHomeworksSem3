@@ -83,7 +83,7 @@ namespace Client
             return await DownloadFile(size, path);
         }
 
-        private async Task<long> FindSizeOfFile()
+        protected async Task<long> FindSizeOfFile()
         {
             var buffer = new byte[long.MaxValue.ToString().Length + 1];
             await streamHandler.ReadAsync(buffer, 0, 2);

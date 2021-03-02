@@ -75,11 +75,11 @@ namespace Client
                     switch (input[0])
                     {
                         case '1':
-                            await ShowListResult(input.Substring(2));
+                            await ShowListResult(input[2..]);
 
                             break;
                         case '2':
-                            await ShowGetResult(input.Substring(2));
+                            await ShowGetResult(input[2..]);
 
                             break;
                     }
