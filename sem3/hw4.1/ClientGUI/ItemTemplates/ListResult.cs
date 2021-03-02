@@ -4,7 +4,7 @@
     {
         public string ImageSource { get; set; }
         public string Name { get; set; }
-        public bool IsDirectory { get; private set; }
+        public bool IsDirectory { get; }
 
         public ListResult(bool isDirectory, string name)
         {

@@ -94,11 +94,10 @@ namespace ClientGUI
                 {
                     downloadFile.Completion = args.Progress;
                 };
-                var ftpClientForDownloading =
+                using var ftpClientForDownloading =
                     new FtpClient(ftpClientStreamHandlerGui);
                 await ftpClientForDownloading.GetAsync(fileName);
                 tcpClient.Close();
-                ftpClientForDownloading.Dispose();
             });
         }
 

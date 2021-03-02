@@ -29,17 +29,10 @@ namespace ClientGUI
 
         private async void ConnectCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!int.TryParse(PortBox.Text, out var port))
-            {
-                MessageBox.Show(IncorrectPortMessage, ErrorMessageBoxCaption);
-                return;
-            }
-
-            var address = AddressBox.Text;
             TcpClient tcpClient;
             try
             {
-                tcpClient = await Task.Run(() => new TcpClient(address, port));
+                tcpClient = await Task.Run(() => new TcpClient(Address, Port));
             }
             catch
             {
@@ -48,13 +41,13 @@ namespace ClientGUI
             }
 
             var ftpClient = new FtpClient(new FtpClientStreamHandlerGui(tcpClient.GetStream()));
-            var workingWindow = new WorkingWindow(await ClientViewModel.BuildViewModel(port, address, ftpClient));
+            var workingWindow = new WorkingWindow(await ClientViewModel.BuildViewModel(Port, Address, ftpClient));
             workingWindow.Show();
         }
 
         private void ConnectCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = AddressBox.Text.Length != 0 && PortBox.Text.Length != 0;
+            e.CanExecute = Address.Length != 0 && Port >= 1 && Port <= 65535;
         }
     }
 }
