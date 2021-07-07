@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineChatTests", "OnlineChatTests\OnlineChatTests.csproj", "{FC0BEA50-7785-4A53-8E6E-0A722B714CDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineChat", "OnlineChat\OnlineChat.csproj", "{42C8C592-4B66-45E9-9605-78E659BE42D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC0BEA50-7785-4A53-8E6E-0A722B714CDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC0BEA50-7785-4A53-8E6E-0A722B714CDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC0BEA50-7785-4A53-8E6E-0A722B714CDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC0BEA50-7785-4A53-8E6E-0A722B714CDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42C8C592-4B66-45E9-9605-78E659BE42D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42C8C592-4B66-45E9-9605-78E659BE42D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42C8C592-4B66-45E9-9605-78E659BE42D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42C8C592-4B66-45E9-9605-78E659BE42D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {01B7220E-C9F6-4A3D-8BC6-F13F463AEF8C}
+	EndGlobalSection
+EndGlobal

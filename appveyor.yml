@@ -5,6 +5,7 @@ environment:
   matrix:
   - solution_name: sem3\hw1.1\hw1.1.sln
   - solution_name: sem3\hw2.1\hw2.1.sln
+  - solution_name: sem3\OnlineChat\OnlineChat.sln
   - solution_name: sem3\hw3.1\hw3.1.sln
   - solution_name: sem3\hw4.1\hw4.1.sln
   - solution_name: sem3\MyNUnit\MyNUnit.sln
